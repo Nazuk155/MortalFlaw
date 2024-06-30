@@ -1,0 +1,28 @@
+I fixed this error:
+
+Error at CMakeLists.txt:8 (find_package):
+  By not providing "FindSDL2m.cmake" in CMAKE_MODULE_PATH this project has
+  asked CMake to find a package configuration file provided by "SDL2m", but
+  CMake did not find one.
+
+  Could not find a package configuration file provided by "SDL2m" with any of
+  the following names:
+
+    SDL2mConfig.cmake
+    sdl2m-config.cmake
+
+  Add the installation prefix of "SDL2m" to CMAKE_PREFIX_PATH or set
+  "SDL2m_DIR" to a directory containing one of the above files.  If "SDL2m"
+  provides a separate development package or SDK, be sure it has been
+  installed.
+
+
+-- Configuring incomplete, errors occurred!
+
+[Finished]
+
+By downloading the # SDL2 CMake modules fix from this Repository:
+
+https://github.com/aminosbh/sdl2-cmake-modules
+
+Documentation provided on git and in the README inside the cmake folder.
