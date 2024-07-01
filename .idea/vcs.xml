@@ -3,6 +3,8 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../Advanced_Cpp-Projekt_MH" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake/sdl2" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../pe2-uebungen" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../v03-klasse-automobil" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../v09-actor-role-example" vcs="Git" />

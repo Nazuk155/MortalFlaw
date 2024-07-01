@@ -1,5 +1,6 @@
 # ninja log v6
-1	973	1719778280925280580	CMakeFiles/FreshMortalFlaw.dir/main.cpp.o	3aed671308cc41b2
-973	1090	1719778281897285183	FreshMortalFlaw	4ec4fdd38767f9e0
-1	916	1719779447913845058	CMakeFiles/FreshMortalFlaw.dir/main.cpp.o	3aed671308cc41b2
-917	1042	1719779448829848278	FreshMortalFlaw	8f8a3d6794cc657f
+2	1614	1719844478928408592	CMakeFiles/FreshMortalFlaw.dir/main.cpp.o	3aed671308cc41b2
+2131	2286	1719844481056412464	FreshMortalFlaw	539b0b6de189b04f
+0	47	1719846705834639170	build.ninja	d75b06a1ce34040f
+2	2113	1719844478928408592	CMakeFiles/FreshMortalFlaw.dir/Player.cpp.o	9f07c3cfdb90682a
+2	2131	1719844478928408592	CMakeFiles/FreshMortalFlaw.dir/LTexture.cpp.o	f03f0cb0374482bd
