@@ -6,8 +6,6 @@
 #define PLAYER_H
 #include <global.h>
 
-#include "LTexture.h"
-
 class Player
 {
 public:
@@ -16,7 +14,7 @@ public:
     static const int PLAYER_HEIGHT = 20;
 
     //Maximum axis velocity of the dot
-    static const int PLAYER_VEL = 10;
+    constexpr static const float PLAYER_VEL = 0.1;
 
     //Initializes the variables
     Player();
@@ -28,14 +26,16 @@ public:
     void move();
 
     //Shows the dot on the screen
-    void render(LTexture texture);
-
+    Point getRenderPos();
+    float getXPos();
+    float getYPos();
 private:
     //The X and Y offsets of the dot
-    int mPosX, mPosY;
-
+    float mPosX, mPosY;
+    Point pos;
     //The velocity of the dot
-    int mVelX, mVelY;
+    float mVelX, mVelY;
+
 };
 
 

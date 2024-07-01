@@ -4,14 +4,14 @@
 
 #include "Player.h"
 
-#include "LTexture.h"
+
 
 Player::Player()
 {
     //Initialize the offsets
     mPosX = 0;
     mPosY = 0;
-
+    //Point pos {mPosX,mPosY};
     //Initialize the velocity
     mVelX = 0;
     mVelY = 0;
@@ -68,8 +68,11 @@ void Player::move()
     }
 }
 
-void Player::render(LTexture gPlayerTexture)
+Point Player::getRenderPos()
 {
     //Show the player
-    gPlayerTexture.render( mPosX, mPosY );
+    return pos;
 }
+
+float Player::getXPos(){return mPosX;}
+float Player::getYPos(){return mPosY;}

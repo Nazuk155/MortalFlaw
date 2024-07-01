@@ -63,20 +63,6 @@ build CMakeFiles/FreshMortalFlaw.dir/Player.cpp.o: CXX_COMPILER__FreshMortalFlaw
   OBJECT_DIR = CMakeFiles/FreshMortalFlaw.dir
   OBJECT_FILE_DIR = CMakeFiles/FreshMortalFlaw.dir
 
-build CMakeFiles/FreshMortalFlaw.dir/LTexture.cpp.o: CXX_COMPILER__FreshMortalFlaw_unscanned_Debug /home/max/CLionProjects/FreshMortalFlaw/LTexture.cpp || cmake_object_order_depends_target_FreshMortalFlaw
-  DEP_FILE = CMakeFiles/FreshMortalFlaw.dir/LTexture.cpp.o.d
-  FLAGS = -g -std=gnu++2a -fdiagnostics-color=always
-  INCLUDES = -I/home/max/CLionProjects/FreshMortalFlaw/. -isystem /usr/include/SDL2
-  OBJECT_DIR = CMakeFiles/FreshMortalFlaw.dir
-  OBJECT_FILE_DIR = CMakeFiles/FreshMortalFlaw.dir
-
-build CMakeFiles/FreshMortalFlaw.dir/basis.cpp.o: CXX_COMPILER__FreshMortalFlaw_unscanned_Debug /home/max/CLionProjects/FreshMortalFlaw/basis.cpp || cmake_object_order_depends_target_FreshMortalFlaw
-  DEP_FILE = CMakeFiles/FreshMortalFlaw.dir/basis.cpp.o.d
-  FLAGS = -g -std=gnu++2a -fdiagnostics-color=always
-  INCLUDES = -I/home/max/CLionProjects/FreshMortalFlaw/. -isystem /usr/include/SDL2
-  OBJECT_DIR = CMakeFiles/FreshMortalFlaw.dir
-  OBJECT_FILE_DIR = CMakeFiles/FreshMortalFlaw.dir
-
 
 # =============================================================================
 # Link build statements for EXECUTABLE target FreshMortalFlaw
@@ -85,7 +71,7 @@ build CMakeFiles/FreshMortalFlaw.dir/basis.cpp.o: CXX_COMPILER__FreshMortalFlaw_
 #############################################
 # Link the executable FreshMortalFlaw
 
-build FreshMortalFlaw: CXX_EXECUTABLE_LINKER__FreshMortalFlaw_Debug CMakeFiles/FreshMortalFlaw.dir/main.cpp.o CMakeFiles/FreshMortalFlaw.dir/Player.cpp.o CMakeFiles/FreshMortalFlaw.dir/LTexture.cpp.o CMakeFiles/FreshMortalFlaw.dir/basis.cpp.o | /usr/lib/x86_64-linux-gnu/libSDL2_image.so /usr/lib/x86_64-linux-gnu/libSDL2_mixer.so /usr/lib/x86_64-linux-gnu/libSDL2main.a /usr/lib/x86_64-linux-gnu/libSDL2.so
+build FreshMortalFlaw: CXX_EXECUTABLE_LINKER__FreshMortalFlaw_Debug CMakeFiles/FreshMortalFlaw.dir/main.cpp.o CMakeFiles/FreshMortalFlaw.dir/Player.cpp.o | /usr/lib/x86_64-linux-gnu/libSDL2_image.so /usr/lib/x86_64-linux-gnu/libSDL2_mixer.so /usr/lib/x86_64-linux-gnu/libSDL2main.a /usr/lib/x86_64-linux-gnu/libSDL2.so
   FLAGS = -g
   LINK_LIBRARIES = /usr/lib/x86_64-linux-gnu/libSDL2_image.so  /usr/lib/x86_64-linux-gnu/libSDL2_mixer.so  /usr/lib/x86_64-linux-gnu/libSDL2main.a  /usr/lib/x86_64-linux-gnu/libSDL2.so  -lpthread
   OBJECT_DIR = CMakeFiles/FreshMortalFlaw.dir

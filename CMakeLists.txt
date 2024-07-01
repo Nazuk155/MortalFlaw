@@ -24,10 +24,7 @@ add_executable(FreshMortalFlaw
         Player.h
         recthelper.h
         global.h
-        LTexture.cpp
-        LTexture.h
-        basis.cpp
-        basis.h
+
 
 )
 target_link_libraries(${PROJECT_NAME}
