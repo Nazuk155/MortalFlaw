@@ -308,6 +308,15 @@ SDL2m_DIR:PATH=SDL2m_DIR-NOTFOUND
 //The directory containing a CMake configuration file for SDL2main.
 SDL2main_DIR:PATH=SDL2main_DIR-NOTFOUND
 
+//Path to a file.
+SDL_TTF_INCLUDE_DIR:PATH=SDL_TTF_INCLUDE_DIR-NOTFOUND
+
+//Path to a library.
+SDL_TTF_LIBRARY:FILEPATH=SDL_TTF_LIBRARY-NOTFOUND
+
+//The directory containing a CMake configuration file for fmt.
+fmt_DIR:PATH=/usr/local/lib/cmake/fmt
+
 
 ########################
 # INTERNAL cache entries

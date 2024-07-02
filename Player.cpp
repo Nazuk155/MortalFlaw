@@ -15,6 +15,10 @@ Player::Player()
     //Initialize the velocity
     mVelX = 0;
     mVelY = 0;
+    _playerRect = {mPosX,mPosY,PLAYER_WIDTH,PLAYER_HEIGHT};
+
+    //Not a good idea to have a rect for every instance of the object. Try to keep visual and data apart!
+    //SDL_Rect renderQuad = { mPosX, mPosY, PLAYER_WIDTH, PLAYER_HEIGHT };
 }
 
 void Player::handleEvent( SDL_Event& e )
@@ -68,11 +72,8 @@ void Player::move()
     }
 }
 
-Point Player::getRenderPos()
-{
-    //Show the player
-    return pos;
-}
 
-float Player::getXPos(){return mPosX;}
-float Player::getYPos(){return mPosY;}
+int Player::getXPos() const{return mPosX;}
+int Player::getYPos() const{return mPosY;}
+int Player::getWidth(){return PLAYER_WIDTH;}
+int Player::getHeight(){return PLAYER_HEIGHT;}

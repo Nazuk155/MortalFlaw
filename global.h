@@ -6,6 +6,7 @@
 #define GLOBAL_H
 #pragma once
 
+#define BaseFolder "/home/max/CLionProjects/FreshMortalFlaw"
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 640;
@@ -44,7 +45,7 @@ const int SCREEN_HEIGHT = 480;
 #include <SDL_events.h>
 #include <SDL_render.h>
 #include <SDL_video.h>
-//#include <SDL_ttf.h>
+#include <SDL_ttf.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
 
@@ -72,7 +73,7 @@ using Surface   = SDL_Surface;
 using Texture   = SDL_Texture;
 using Renderer  = SDL_Renderer;
 using Window    = SDL_Window;
-//using Font      = TTF_Font;
+using Font      = TTF_Font;
 using Chunk     = Mix_Chunk;
 //using Sound     = Mix_Chunk;
 using Music     = Mix_Music;
