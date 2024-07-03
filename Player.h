@@ -10,8 +10,8 @@ class Player
 {
 public:
     //The dimensions of the dot
-     const int PLAYER_WIDTH = 20;
-     const int PLAYER_HEIGHT = 20;
+      int PLAYER_WIDTH = 20;
+      int PLAYER_HEIGHT = 20;
 
 
 
@@ -19,7 +19,7 @@ public:
     //Maximum axis velocity of the dot
     constexpr static const int PLAYER_VEL = 5;
 
-    Rect _playerRect;
+    // _playerRect;
     //Initializes the variables
     Player();
 
@@ -36,15 +36,19 @@ public:
     [[nodiscard]] int getYPos() const;
      int getWidth();
      int getHeight();
-
+     void setXPos(int newX){ mPosX = newX; }
+     void setYPos(int newY){ mPosY = newY; }
+    void setWidth(int newW){ PLAYER_WIDTH = newW; }
+    void setHeight(int newH){ PLAYER_HEIGHT = newH; }
      ///not sure about this
-     Rect& getRect(){return _playerRect;}
+     //Rect getRect(){return _playerRect;}
 private:
     //The X and Y offsets of the dot
     int mPosX, mPosY;
 
     //The velocity of the dot
     int mVelX, mVelY;
+
 
 };
 

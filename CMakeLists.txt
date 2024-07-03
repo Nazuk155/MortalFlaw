@@ -29,6 +29,8 @@ add_executable(FreshMortalFlaw
         examplegame.cpp
         examplegame.h
         MortalFlawState.cpp
+        introstate.cpp
+        plasmastate.cpp
 
 
 )

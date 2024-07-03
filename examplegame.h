@@ -32,6 +32,7 @@ class MortalFlawState : public GameState
 {
 
 protected:
+    Surface * backgroundSurface = nullptr;
     Font    * font              = nullptr;
     Texture * playerTexture     = nullptr;
     Music   * music             = nullptr;
@@ -39,6 +40,11 @@ protected:
     Texture * blendedText       = nullptr;
     Point     blendedTextSize   = { 0, 0 };
     Player *p;
+
+
+    static constexpr const Color white { 255, 255, 255, 255 };
+    static constexpr const Color black { 0, 0, 0, 255 };
+
 
 public:
     using GameState::GameState;
@@ -53,6 +59,7 @@ public:
     //new functions
    // void renderFromSpritesheet(int x, int y,int width,int height,SDL_Texture* t, SDL_Rect* clip = nullptr, double angle = 0.0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
     void renderFromSpritesheet(SDL_Texture* t,Rect &target, SDL_Rect* clip = nullptr, double angle = 0.0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
+    void renderFromSpritesheet(int targetX,int targetY,int targetW,int targetH,SDL_Texture* t, SDL_Rect* clip = nullptr, double angle = 0.0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
 };
 
 

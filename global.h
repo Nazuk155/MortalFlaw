@@ -6,7 +6,7 @@
 #define GLOBAL_H
 #pragma once
 
-#define BaseFolder "/home/max/CLionProjects/FreshMortalFlaw"
+#define BaseFolder "/home/max/CLionProjects/FreshMortalFlaw/"
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 640;
