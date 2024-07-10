@@ -29,25 +29,23 @@ public:
     //Moves the dot
     void move();
 
-    //Shows the dot on the screen
-    //Point getRenderPos();
+
 
     [[nodiscard]] int getXPos() const;
     [[nodiscard]] int getYPos() const;
-     int getWidth();
-     int getHeight();
-     void setXPos(int newX){ mPosX = newX; }
-     void setYPos(int newY){ mPosY = newY; }
+     int getWidth() const;
+     int getHeight() const;
+     void setXPos(int newX){ PosX = newX; }
+     void setYPos(int newY){ PosY = newY; }
     void setWidth(int newW){ PLAYER_WIDTH = newW; }
     void setHeight(int newH){ PLAYER_HEIGHT = newH; }
-     ///not sure about this
-     //Rect getRect(){return _playerRect;}
+
 private:
     //The X and Y offsets of the dot
-    int mPosX, mPosY;
+    int PosX, PosY;
 
     //The velocity of the dot
-    int mVelX, mVelY;
+    int VelX, VelY;
 
 
 };

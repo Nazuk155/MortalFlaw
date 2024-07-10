@@ -8,17 +8,18 @@
 
 Player::Player()
 {
-    //Initialize the offsets
-    mPosX = 0;
-    mPosY = 0;
-    //Point pos {mPosX,mPosY};
-    //Initialize the velocity
-    mVelX = ß;
-    mVelY = 0;
-   // _playerRect = {mPosX,mPosY,PLAYER_WIDTH,PLAYER_HEIGHT};
+    ///needs inventory/deck, current hand pointers, facing direction,stats like hp etc.,
 
-    //Not a good idea to have a rect for every instance of the object. Try to keep visual and data apart!
-    //SDL_Rect renderQuad = { mPosX, mPosY, PLAYER_WIDTH, PLAYER_HEIGHT };
+    //Initialize the offsets
+    PosX = 0;
+    PosY = 0;
+
+    //Initialize the velocity
+    VelX = 0;
+    VelY = 0;
+   // _playerRect = {PosX,PosY,PLAYER_WIDTH,PLAYER_HEIGHT};
+
+
 }
 
 void Player::handleEvent( SDL_Event& e )
@@ -29,10 +30,10 @@ void Player::handleEvent( SDL_Event& e )
         //Adjust the velocity
         switch( e.key.keysym.sym )
         {
-        case SDLK_UP: mVelY -= PLAYER_VEL; break;
-        case SDLK_DOWN: mVelY += PLAYER_VEL; break;
-        case SDLK_LEFT: mVelX -= PLAYER_VEL; break;
-        case SDLK_RIGHT: mVelX += PLAYER_VEL; break;
+        case SDLK_UP: VelY -= PLAYER_VEL; break;
+        case SDLK_DOWN: VelY += PLAYER_VEL; break;
+        case SDLK_LEFT: VelX -= PLAYER_VEL; break;
+        case SDLK_RIGHT: VelX += PLAYER_VEL; break;
         }
     }
     //If a key was released
@@ -41,10 +42,10 @@ void Player::handleEvent( SDL_Event& e )
         //Adjust the velocity
         switch( e.key.keysym.sym )
         {
-        case SDLK_UP: mVelY += PLAYER_VEL; break;
-        case SDLK_DOWN: mVelY -= PLAYER_VEL; break;
-        case SDLK_LEFT: mVelX += PLAYER_VEL; break;
-        case SDLK_RIGHT: mVelX -= PLAYER_VEL; break;
+        case SDLK_UP: VelY += PLAYER_VEL; break;
+        case SDLK_DOWN: VelY -= PLAYER_VEL; break;
+        case SDLK_LEFT: VelX += PLAYER_VEL; break;
+        case SDLK_RIGHT: VelX -= PLAYER_VEL; break;
         }
     }
 }
@@ -52,29 +53,29 @@ void Player::handleEvent( SDL_Event& e )
 void Player::move()
 {
     //Move the Player left or right
-    mPosX += mVelX;
+    PosX += VelX;
 
     //If the Player went too far to the left or right
-    if( ( mPosX < 0 ) || ( mPosX + PLAYER_WIDTH > SCREEN_WIDTH ) )
+    if((PosX < 0 ) || (PosX + PLAYER_WIDTH > SCREEN_WIDTH ) )
     {
         //Move back
-        mPosX -= mVelX;
+        PosX -= VelX;
     }
 
     //Move the Player up or down
-    mPosY += mVelY;
+    PosY += VelY;
 
     //If the Player went too far up or down
-    if( ( mPosY < 0 ) || ( mPosY + PLAYER_HEIGHT > SCREEN_HEIGHT ) )
+    if((PosY < 0 ) || (PosY + PLAYER_HEIGHT > SCREEN_HEIGHT ) )
     {
         //Move back
-        mPosY -= mVelY;
+        PosY -= VelY;
     }
 }
 
 
-int Player::getXPos() const{return mPosX;}
-int Player::getYPos() const{return mPosY;}
-int Player::getWidth(){return PLAYER_WIDTH;}
-int Player::getHeight(){return PLAYER_HEIGHT;}
+int Player::getXPos() const{return PosX;}
+int Player::getYPos() const{return PosY;}
+int Player::getWidth() const{return PLAYER_WIDTH;}
+int Player::getHeight() const{return PLAYER_HEIGHT;}
 

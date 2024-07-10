@@ -10,6 +10,7 @@
 #include <gamebase.h>
 #include <recthelper.h>
 #include "Player.h"
+#include <Enemy.h>
 
 class ExampleGame;
 class IntroState;
@@ -32,13 +33,24 @@ class MortalFlawState : public GameState
 {
 
 protected:
+
+    //surfaces
     Surface * backgroundSurface = nullptr;
+
     Font    * font              = nullptr;
-    Texture * playerTexture     = nullptr;
     Music   * music             = nullptr;
     Chunk   * sound             = nullptr;
+
+    //textures
+    Texture * playerTexture     = nullptr;
+    Texture * enemyTexture      = nullptr;
     Texture * blendedText       = nullptr;
+
+
     Point     blendedTextSize   = { 0, 0 };
+
+    //testing single enemy
+    Enemy *e;
     Player *p;
 
 
@@ -57,9 +69,12 @@ public:
     void Render( const u32 frame, const u32 totalMSec, const float deltaT ) override;
 
     //new functions
-   // void renderFromSpritesheet(int x, int y,int width,int height,SDL_Texture* t, SDL_Rect* clip = nullptr, double angle = 0.0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
-    void renderFromSpritesheet(SDL_Texture* t,Rect &target, SDL_Rect* clip = nullptr, double angle = 0.0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
+
+
     void renderFromSpritesheet(int targetX,int targetY,int targetW,int targetH,SDL_Texture* t, SDL_Rect* clip = nullptr, double angle = 0.0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
+    void renderFromSpritesheet(Rect values,SDL_Texture* t, SDL_Rect* clip = nullptr, double angle = 0.0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
+
+    Texture* loadFromFile(const std::string& path);
 };
 
 

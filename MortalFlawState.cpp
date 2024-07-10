@@ -4,7 +4,11 @@
 #include <examplegame.h>
 
 
+// implement the classes GameObject and Enemy, try collision and attacks
+// add UI for the player stats, timer, and current hand as well as cooldown token
+// next implement the classes deck and card
 
+///next to implement: Enemy and collision
 
 void MortalFlawState::Init()
 {
@@ -13,10 +17,10 @@ void MortalFlawState::Init()
 
     //------------ Asset Paths
     std::string playerPath = BaseFolder "Ressources/dot.bmp";
-
+    std::string enemyPath  = BaseFolder "Ressources/Assets/Enemy/Enemy_Sprite_Bases.bmp";
 
     //----------------
-    // TextureWrapper playerTexture
+
     p = new Player();
 
     /*
@@ -29,34 +33,9 @@ void MortalFlawState::Init()
 */
     SDL_SetRenderDrawColor( render, 0xFF, 0xFF, 0xFF, 0xFF );
 
-    ///____ refactor to function loadFromFile(std::string path,Texture * target)
-    Texture * newTexture = nullptr;
-    Surface * playerSurface =  IMG_Load(playerPath.c_str());
-    if( playerSurface == nullptr )
-    {
-        printf( "Unable to load image %s! SDL_image Error: %s\n", playerPath.c_str(), IMG_GetError() );
-    }
-    else
-    {
-        //Color key image
-        SDL_SetColorKey( playerSurface, SDL_TRUE, SDL_MapRGB( playerSurface->format, 0, 0xFF, 0xFF ) );
 
-        //Create texture from surface pixels
-        newTexture = SDL_CreateTextureFromSurface( render, playerSurface );
-        if( newTexture == nullptr )
-        {
-            printf( "Unable to create texture from %s! SDL Error: %s\n", playerPath.c_str(), SDL_GetError() );
-        }
-        else
-        {
-            p->PLAYER_WIDTH = playerSurface->w;
-            p->PLAYER_WIDTH = playerSurface->h;
-        }
-        SDL_FreeSurface(playerSurface);
-    }
-    playerTexture = newTexture;
-    //return playerTexture != nullptr;
-    ///------------------------------
+    playerTexture = loadFromFile(playerPath);
+
 
     const Point & winSize = game.GetWindowSize();
     const Point resolution = winSize / 8;
@@ -143,4 +122,46 @@ void MortalFlawState::renderFromSpritesheet(int targetX,int targetY,int targetW,
 
     //Render to screen
     SDL_RenderCopyEx( render, t,clip, &renderQuad, angle, center, flip );
+}
+
+//Version using a SDL_Rect to pull values from. Added for utility
+void MortalFlawState::renderFromSpritesheet(Rect values,SDL_Texture* t, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip){
+    SDL_Rect renderQuad = {values.x,values.y,values.w,values.h};
+
+    //Set clip rendering dimensions
+    if( clip != nullptr )
+    {
+        renderQuad.w = clip->w;
+        renderQuad.h = clip->h;
+    }
+
+    //Render to screen
+    SDL_RenderCopyEx( render, t,clip, &renderQuad, angle, center, flip );
+}
+
+//result should be saved in a texture related to a object within MortalFlawState. Surface Width/Height should match player width/height otherwise texture needs to be scaled.
+Texture* MortalFlawState::loadFromFile(const std::string& path){
+
+    Texture * newTexture = nullptr;
+    Surface * loadedSurface =  IMG_Load(path.c_str());
+    if( loadedSurface == nullptr )
+    {
+        printf( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );
+    }
+    else
+    {
+        //Color key image
+        SDL_SetColorKey( loadedSurface, SDL_TRUE, SDL_MapRGB( loadedSurface->format, 0, 0xFF, 0xFF ) );
+
+        //Create texture from surface pixels
+        newTexture = SDL_CreateTextureFromSurface( render, loadedSurface );
+        if( newTexture == nullptr )
+        {
+            printf( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
+        }
+
+        SDL_FreeSurface(loadedSurface);
+    }
+
+    return newTexture;
 }

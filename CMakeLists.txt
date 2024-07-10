@@ -31,6 +31,8 @@ add_executable(FreshMortalFlaw
         MortalFlawState.cpp
         introstate.cpp
         plasmastate.cpp
+        Enemy.cpp
+        Enemy.h
 
 
 )
