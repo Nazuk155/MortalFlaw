@@ -49,6 +49,10 @@ const int SCREEN_HEIGHT = 960;
 #include <SDL_image.h>
 #include <SDL_mixer.h>
 
+///Maybe put this in a AngleHelper.h
+// added enum class Angle
+
+
 using i8    = std::int8_t;
 using i16   = std::int16_t;
 using i32   = std::int32_t;

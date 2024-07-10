@@ -18,6 +18,7 @@ void MortalFlawState::Init()
 
     //------------ Asset Paths
     std::string playerPath = BaseFolder "Ressources/Assets/Player/Player_Spritesheets/Player_Sprite_Bases_Bigger.png";
+    std::string playerFacingPath = BaseFolder "Ressources/Assets/Player/Player_Indicators/Player_Facing_Direction_Indicator.png";
     std::string enemyPath  = BaseFolder "Ressources/Assets/Enemy/Enemy_Sprite_Bases.bmp";
 
     //----------------
@@ -42,6 +43,7 @@ void MortalFlawState::Init()
 
     playerTexture = loadFromFile(playerPath);
     enemyTexture = loadFromFile(enemyPath);
+    playerFacingTexture = loadFromFile(playerFacingPath);
 
     const Point & winSize = game.GetWindowSize();
     const Point resolution = winSize ;
@@ -54,6 +56,8 @@ void MortalFlawState::UnInit()
 {
     SDL_DestroyTexture(playerTexture);
     SDL_DestroyTexture(enemyTexture);
+    SDL_DestroyTexture(playerFacingTexture);
+    playerFacingTexture = nullptr;
     playerTexture = nullptr;
     enemyTexture = nullptr;
 }
@@ -112,18 +116,21 @@ void MortalFlawState::Render( const u32 frame, const u32 totalMSec, const float 
 {
 
     const Point & winSize = game.GetWindowSize();
-
+    SDL_SetRenderDrawColor( render, 0xFF, 0x00, 0xFF, 0xFF );
+    SDL_RenderClear( render);
     {
        // const SDL_Rect *const dst_rect {0, 0, winSize.x, winSize.y };
-        SDL_FillRect(backgroundSurface,nullptr, SDL_MapRGBA(backgroundSurface->format,white.r,white.g,white.b,white.a));
+        SDL_FillRect(backgroundSurface,nullptr, SDL_MapRGBA(backgroundSurface->format,0,white.g,white.b,white.a));
     }
 
     //Clear screen
-    SDL_SetRenderDrawColor( render, 0xFF, 0xFF, 0xFF, 0xFF );
-    SDL_RenderClear( render);
+
+
 
     ///Write Docu for these
     renderFromSpritesheet(p->getXPos(),p->getYPos(),p->getWidth(),p->getHeight(),playerTexture,&playerClipRect);
+    renderFromSpritesheet(p->getXPos(),p->getYPos(),p->getWidth(),p->getHeight(),playerFacingTexture, nullptr,
+                          p->getFacingAngle());
     renderFromSpritesheet(enemyInstance->getRect(), enemyTexture);
 
 
@@ -138,14 +145,14 @@ void MortalFlawState::Render( const u32 frame, const u32 totalMSec, const float 
 
 ///is this correct? probably yes. No Wrapper required
 //take the texture using the clip Rect and blit it onto target Rect
-void MortalFlawState::renderFromSpritesheet(int targetX,int targetY,int targetW,int targetH,SDL_Texture* t,const Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip){
+void MortalFlawState::renderFromSpritesheet(int targetX,int targetY,int targetW,int targetH,SDL_Texture* t,const Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip,bool useClipsize){
     SDL_Rect renderQuad = { targetX,targetY,targetW,targetH};
 
     //Set clip rendering dimensions
-    if( clip != nullptr )
+    if( clip != nullptr && useClipsize)
     {
-     //   renderQuad.w = clip->w;
-      //  renderQuad.h = clip->h;
+        renderQuad.w = clip->w;
+        renderQuad.h = clip->h;
     }
 
     //Render to screen
@@ -153,11 +160,11 @@ void MortalFlawState::renderFromSpritesheet(int targetX,int targetY,int targetW,
 }
 
 //Version using a SDL_Rect to pull values from. Added for utility
-void MortalFlawState::renderFromSpritesheet(Rect values,SDL_Texture* t, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip){
+void MortalFlawState::renderFromSpritesheet(Rect values,SDL_Texture* t, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip,bool useClipSize){
     SDL_Rect renderQuad = {values.x,values.y,values.w,values.h};
 
     //Set clip rendering dimensions
-    if( clip != nullptr )
+    if( clip != nullptr && useClipSize)
     {
         renderQuad.w = clip->w;
         renderQuad.h = clip->h;

@@ -9,6 +9,7 @@
 
 #include <gamebase.h>
 #include <recthelper.h>
+
 #include "Player.h"
 #include <Enemy.h>
 
@@ -44,6 +45,7 @@ protected:
     //textures
     Texture * playerTexture     = nullptr;
     Texture * enemyTexture      = nullptr;
+    Texture * playerFacingTexture      = nullptr;
     Texture * blendedText       = nullptr;
 
 
@@ -79,8 +81,25 @@ public:
     //new functions
 
 
-    void renderFromSpritesheet(int targetX,int targetY,int targetW,int targetH,SDL_Texture* t, const SDL_Rect* clip = nullptr, double angle = 0.0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
-    void renderFromSpritesheet(Rect values,SDL_Texture* t, SDL_Rect* clip = nullptr, double angle = 0.0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
+    void renderFromSpritesheet(int targetX,
+                               int targetY,
+                               int targetW,
+                               int targetH,
+                               SDL_Texture* t,
+                               const SDL_Rect* clip = nullptr,
+                               double angle = 0.0,
+                               SDL_Point* center = nullptr,
+                               SDL_RendererFlip flip = SDL_FLIP_NONE,
+                               bool useClipSize = false
+                                       );
+
+    void renderFromSpritesheet(Rect values,
+                               SDL_Texture* t,
+                               SDL_Rect* clip = nullptr,
+                               double angle = 0.0,
+                               SDL_Point* center = nullptr,
+                               SDL_RendererFlip flip = SDL_FLIP_NONE,
+                               bool useClipSize = false);
 
     Texture* loadFromFile(const std::string& path);
 };

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.24)
 project(FreshMortalFlaw)
 
 set(CMAKE_CXX_STANDARD 20)
-
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
 
 
@@ -33,6 +33,8 @@ add_executable(FreshMortalFlaw
         plasmastate.cpp
         Enemy.cpp
         Enemy.h
+        AngleHelper.h
+        AngleHelper.cpp
 
 
 )
