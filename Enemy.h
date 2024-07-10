@@ -21,10 +21,11 @@ public:
     void setHeight(int newH){ EnmRect.h = newH; }
     void setRect(Rect newR){ EnmRect = newR;}
     void setRect(int x,int y,int w,int h){EnmRect.x = x;EnmRect.y = y;EnmRect.w = w;EnmRect.h = h;}
+    void setVelocity(int newVx = 0,int newVy = 0){VelX = newVx;VelY = newVy;}
 
-
+    void move();
 private:
-    Rect EnmRect;
+    Rect EnmRect{};
     int VelX;
     int VelY;
 

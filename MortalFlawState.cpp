@@ -9,19 +9,25 @@
 // next implement the classes deck and card
 
 ///next to implement: Enemy and collision
-
+///Card Library mit o(1) Suchfunktion durch IDs als enums implementieren
+/// random engine researchen
 void MortalFlawState::Init()
 {
     GameState::Init();
 
 
     //------------ Asset Paths
-    std::string playerPath = BaseFolder "Ressources/dot.bmp";
+    std::string playerPath = BaseFolder "Ressources/Assets/Player/Player_Spritesheets/Player_Sprite_Bases_Bigger.png";
     std::string enemyPath  = BaseFolder "Ressources/Assets/Enemy/Enemy_Sprite_Bases.bmp";
 
     //----------------
 
     p = new Player();
+    enemyInstance = new Enemy();
+    for(int i= 0;i<10;i++){
+       auto *temp = new Enemy();
+        enemyVec.push_back(temp);
+    }
 
     /*
     if(!playerTexture)
@@ -35,10 +41,10 @@ void MortalFlawState::Init()
 
 
     playerTexture = loadFromFile(playerPath);
-
+    enemyTexture = loadFromFile(enemyPath);
 
     const Point & winSize = game.GetWindowSize();
-    const Point resolution = winSize / 8;
+    const Point resolution = winSize ;
     backgroundSurface = SDL_CreateRGBSurfaceWithFormat( 0, resolution.x, resolution.y, 32, SDL_PIXELFORMAT_RGBA32 );
 
 }
@@ -47,8 +53,9 @@ void MortalFlawState::Init()
 void MortalFlawState::UnInit()
 {
     SDL_DestroyTexture(playerTexture);
+    SDL_DestroyTexture(enemyTexture);
     playerTexture = nullptr;
-
+    enemyTexture = nullptr;
 }
 
 void MortalFlawState::Events( const u32 frame, const u32 totalMSec, const float deltaT )
@@ -56,33 +63,49 @@ void MortalFlawState::Events( const u32 frame, const u32 totalMSec, const float 
     SDL_PumpEvents();
 
     Event event;
-    bool quit = false;
+
 
         while( SDL_PollEvent( &event ) )
         {
             if( game.HandleEvent( event ) )
                 continue;
 
-
-
-            if( event.type == SDL_QUIT )
-                {
-                    quit = true;
-                }
-
-                //Handle input for the player
-                // This is only okay because player is unique, more players would need a player controller which is not in scope of this Project
-                ///TODO fix player controls
-                p->handleEvent( event );
+            //Handle input for the player
+            // This is only okay because player is unique, more players would need a player controller which is not in scope of this Project
+            ///TODO extend player controls for attacks
+            p->handleEvent( event );
 
         }
 
 
 
 }
-void MortalFlawState::Update( const u32 frame, const u32 totalMSec, const float deltaT )
-{
-    p->move();
+void MortalFlawState::Update( const u32 frame, const u32 totalMSec, const float deltaT ) {
+
+
+
+    //testing velocity
+    //enemyInstance->setVelocity(2, 2);
+    enemyInstance->setXPos(100);
+    enemyInstance->move();
+
+    //testing multiple enemy movement and update collider list
+    int plus = 1;
+    int pos = 32;
+
+    for (Enemy *a: enemyVec) {
+        a->setXPos(pos * plus);
+        a->setVelocity(0, plus);
+        a->move();
+        //update collision box table
+        colliderVec.push_back(a->getRect());
+        plus++;
+
+    }
+    colliderVec.push_back(enemyInstance->getRect());
+
+    p->move(colliderVec);
+    colliderVec.clear();
 
 }
 void MortalFlawState::Render( const u32 frame, const u32 totalMSec, const float deltaT )
@@ -97,27 +120,32 @@ void MortalFlawState::Render( const u32 frame, const u32 totalMSec, const float 
 
     //Clear screen
     SDL_SetRenderDrawColor( render, 0xFF, 0xFF, 0xFF, 0xFF );
-
-    SDL_RenderClear( render );
+    SDL_RenderClear( render);
 
     ///Write Docu for these
-    renderFromSpritesheet(p->getXPos(),p->getYPos(),p->getWidth(),p->getHeight(),playerTexture);
+    renderFromSpritesheet(p->getXPos(),p->getYPos(),p->getWidth(),p->getHeight(),playerTexture,&playerClipRect);
+    renderFromSpritesheet(enemyInstance->getRect(), enemyTexture);
 
+
+    //testing to render
+    for(Enemy *a:enemyVec){
+        renderFromSpritesheet(a->getRect(),enemyTexture);
+    }
 
     SDL_RenderPresent( render );
 
 }
 
-///is this correct? probably yes. Also put this in a Wrapper as a function no actually nothing is gained
+///is this correct? probably yes. No Wrapper required
 //take the texture using the clip Rect and blit it onto target Rect
-void MortalFlawState::renderFromSpritesheet(int targetX,int targetY,int targetW,int targetH,SDL_Texture* t,Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip){
+void MortalFlawState::renderFromSpritesheet(int targetX,int targetY,int targetW,int targetH,SDL_Texture* t,const Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip){
     SDL_Rect renderQuad = { targetX,targetY,targetW,targetH};
 
     //Set clip rendering dimensions
     if( clip != nullptr )
     {
-        renderQuad.w = clip->w;
-        renderQuad.h = clip->h;
+     //   renderQuad.w = clip->w;
+      //  renderQuad.h = clip->h;
     }
 
     //Render to screen

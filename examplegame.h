@@ -50,8 +50,16 @@ protected:
     Point     blendedTextSize   = { 0, 0 };
 
     //testing single enemy
-    Enemy *e;
+    Enemy *enemyInstance;
+    //multiple enemies
+    std::vector<Enemy*> enemyVec;
+
+
     Player *p;
+    //standard player size is 32x32
+    Rect playerClipRect = {64,0,64,64};
+    //collision table
+    std::vector< SDL_Rect > colliderVec;
 
 
     static constexpr const Color white { 255, 255, 255, 255 };
@@ -71,7 +79,7 @@ public:
     //new functions
 
 
-    void renderFromSpritesheet(int targetX,int targetY,int targetW,int targetH,SDL_Texture* t, SDL_Rect* clip = nullptr, double angle = 0.0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
+    void renderFromSpritesheet(int targetX,int targetY,int targetW,int targetH,SDL_Texture* t, const SDL_Rect* clip = nullptr, double angle = 0.0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
     void renderFromSpritesheet(Rect values,SDL_Texture* t, SDL_Rect* clip = nullptr, double angle = 0.0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
 
     Texture* loadFromFile(const std::string& path);

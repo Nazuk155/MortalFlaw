@@ -9,8 +9,8 @@
 #define BaseFolder "/home/max/CLionProjects/FreshMortalFlaw/"
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1280;
+const int SCREEN_HEIGHT = 960;
 
 #define _GLIBC_USE_DEPRECATED 0
 #define _GLIBCXX_USE_DEPRECATED 0

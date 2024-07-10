@@ -7,7 +7,7 @@
 
 Enemy::Enemy()
 {
-    EnmRect = {0,0,0,0};
+    EnmRect = {0,0,32,32};
     VelX = 0;
     VelY = 0;
 }
@@ -36,4 +36,5 @@ void Enemy::move()
         //Move back
         EnmRect.y -= VelY;
     }
+
 }
