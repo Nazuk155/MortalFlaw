@@ -4,7 +4,7 @@
 #include "AngleHelper.h"
 
 
-
+//Useful enum to track facing directions of game objects in 45 degree angles
 
 
 // Overload the + operator to add two angles

@@ -35,6 +35,10 @@ add_executable(FreshMortalFlaw
         Enemy.h
         AngleHelper.h
         AngleHelper.cpp
+        Card.cpp
+        Card.h
+        Card_Dagger.cpp
+        Card_Dagger.h
 
 
 )

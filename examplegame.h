@@ -12,6 +12,7 @@
 
 #include "Player.h"
 #include <Enemy.h>
+#include <Card_Dagger.h>
 
 class ExampleGame;
 class IntroState;
@@ -46,6 +47,7 @@ protected:
     Texture * playerTexture     = nullptr;
     Texture * enemyTexture      = nullptr;
     Texture * playerFacingTexture      = nullptr;
+    Texture * cardDaggerTexture = nullptr;
     Texture * blendedText       = nullptr;
 
 

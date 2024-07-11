@@ -28,7 +28,7 @@ private:
     Rect EnmRect{};
     int VelX;
     int VelY;
-
+/// TODO add a enemy clipRect and SDL_Point for the x,y values
 
 };
 
