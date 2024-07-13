@@ -11,33 +11,28 @@
 class Player
 {
 public:
+
     //The dimensions of the player
       int PLAYER_WIDTH = 32;
       int PLAYER_HEIGHT = 32;
-
     //Maximum axis velocity of the player
     constexpr static const int PLAYER_VEL = 5;
-
     //inventory in public for ease of use
     Vector<Card*> deck;
     Vector<Card*> discard;
     Vector<Card*> burned;
-
+    //cards in hand
+    Vector<Card*> hand;
     Card *slotLeft = nullptr;
     Card *slotRight = nullptr;
     Card *slotMiddle = nullptr;
-
     enum class HandPosition  {L,M,R};
-
     //Stats
-
     u8 health = 5;
-    float drawsReady = 2;
+    float drawsReady = 100;
 
     //Initializes the variables
     Player();
-
-
     //Takes key presses and activates player functions like movement
     void handleEvent( SDL_Event& e );
 
@@ -59,7 +54,8 @@ public:
 
     //getter Methods
     //returns angle in 45 degree steps for rendering rotated sprites based on currentAngle
-    [[nodiscard]] double getFacingAngle() const;
+    [[nodiscard]] double getFacingAngleDouble() const;
+    [[nodiscard]] Angle getFacingAngle() const;
     [[nodiscard]] int getXPos() const;
     [[nodiscard]] int getYPos() const;
     [[nodiscard]] Point * getPoint();

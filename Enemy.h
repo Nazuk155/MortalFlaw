@@ -11,7 +11,7 @@ public:
 
     Enemy();
 
-    //Enemy has a Rect for its values. This inconsistency is just to test if either approach has any real advantages.
+
     Rect getRect();
 
     //setter methods for utility
@@ -25,9 +25,11 @@ public:
 
     void move();
 private:
-    Rect EnmRect{};
+    Rect EnmRect;
+    Rect clip;
     int VelX;
     int VelY;
+
 /// TODO add a enemy clipRect and SDL_Point for the x,y values
 
 };

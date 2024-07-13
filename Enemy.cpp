@@ -8,6 +8,7 @@
 Enemy::Enemy()
 {
     EnmRect = {0,0,32,32};
+    clip = {0,0,64,64};
     VelX = 0;
     VelY = 0;
 }

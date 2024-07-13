@@ -4,15 +4,20 @@
 #include <examplegame.h>
 
 
+///TODO cards in discard or burn that are active will be rendered until their whenActive sets active to false
+// interface on the bottom with timer filling and handcards, next card on left in small, deck next to it. Right side has player ability and discard as well as burn.
+//burned cards can be restored with forge. Player has overload charges or loses a card every 10 seconds from the top of the deck.
+//to not have a constantly shifting deck the player only adds cards calmly to the deck and FORGE actions basically recovers lost ammo back into the deck.
+
 // implement the classes GameObject and Enemy, try collision and attacks
 // add UI for the player stats, timer, and current hand as well as cooldown token
-// next implement the classes deck and card
 
-///next to implement: Enemy and collision
-///Card Library mit o(1) Suchfunktion durch IDs als enums implementieren
+///TODO next to implement: hitIDSet um den selben Enemy nicht nochmal zu treffen wenn eine Karte AoE/Piercing kann. danach clip Koordinaten definieren für player und enemy spritesheet dann UI und Timer.
+///Card Library mit o(1) Suchfunktion durch IDs als enums implementieren / bad idea: Karten sind Objekte die modifikationen erhalten können, besser einzelne objekte in decks als IDs mit mods.
 /// random engine researchen
 void MortalFlawState::Init()
 {
+
     GameState::Init();
 
 
@@ -31,7 +36,7 @@ void MortalFlawState::Init()
     p->setYPos(100);
 
     //add cards to deck
-    for(int i = 0;i<5;i++){
+    for(int i = 0;i<20;i++){
         p->addCardToDeck(new Card_Dagger);
        // p->deck.push_back(new Card_Dagger);
         p->drawCard();
@@ -67,6 +72,8 @@ void MortalFlawState::Init()
 
     const Point & winSize = game.GetWindowSize();
     const Point resolution = winSize ;
+
+    ///TODO fix this add tiles
     backgroundSurface = SDL_CreateRGBSurfaceWithFormat( 0, resolution.x, resolution.y, 32, SDL_PIXELFORMAT_RGBA32 );
 
 }
@@ -98,7 +105,6 @@ void MortalFlawState::Events( const u32 frame, const u32 totalMSec, const float 
 
             //Handle input for the player
             // This is only okay because player is unique, more players would need a player controller which is not in scope of this Project
-            ///TODO extend player controls for attacks
             p->handleEvent( event );
 
         }
@@ -112,15 +118,6 @@ void MortalFlawState::Update( const u32 frame, const u32 totalMSec, const float 
 
     //testing velocity
     //enemyInstance->setVelocity(2, 2);
-    for(Card*e:p->discard)
-    {
-        if(e->active)
-        {
-            //fix magic number here
-            e->cardRect.x = p->getCollisionRect()->x;
-            e->cardRect.y = p->getCollisionRect()->y;
-        }
-    }
     enemyInstance->setXPos(100);
     enemyInstance->move();
 
@@ -129,7 +126,7 @@ void MortalFlawState::Update( const u32 frame, const u32 totalMSec, const float 
     int pos = 32;
 
     for (Enemy *a: enemyVec) {
-        a->setXPos(pos * plus);
+        a->setYPos(pos * plus);
         a->setVelocity(0, plus);
         a->move();
         //update collision box table
@@ -138,9 +135,37 @@ void MortalFlawState::Update( const u32 frame, const u32 totalMSec, const float 
 
     }
     colliderVec.push_back(enemyInstance->getRect());
-    ///TODO add the discard and burn for loop to iterate through the instances of that are active and start their doWhenActive
+    ///TODO add the discard and burn for loop to iterate through the instances of that are active and start their doWhileActive
+    for(Card*e:p->discard)
+    {
+        if(e->active)
+        {
+            //fix magic number here
+          //  e->cardRect.x = p->getCollisionRect()->x;
+           // e->cardRect.y = p->getCollisionRect()->y;
+            //add the doWhenActive here
+            int hits = e->doWhileActive(colliderVec);
+            if(hits <=enemyVec.size())
+            {
+                ///TODO do this next
+                /* card is active until all possible hits have been dealt or max rand/wall is hit
+                 * on hit the hitIDSet adds the enemy to its list so it can not be hit again
+                 * hitIDSet resets when active time of card ends
+                 * */
+
+
+                printf("enemy vec X pos %d",enemyVec[hits]->getRect().x);
+                enemyVec[hits]->setXPos(enemyVec[hits]->getRect().x+100);
+                printf("enemy vec X pos %d",enemyVec[hits]->getRect().x);
+            }
+
+        }
+    }
+    printf(" _");
     p->move(colliderVec);
     colliderVec.clear();
+    p->drawCard();
+
 
 }
 void MortalFlawState::Render( const u32 frame, const u32 totalMSec, const float deltaT )
@@ -151,10 +176,11 @@ void MortalFlawState::Render( const u32 frame, const u32 totalMSec, const float 
     SDL_RenderClear( render);
 
     //render background
-    {
+
        // const SDL_Rect *const dst_rect {0, 0, winSize.x, winSize.y };
-        SDL_FillRect(backgroundSurface,nullptr, SDL_MapRGBA(backgroundSurface->format,0,white.g,white.b,white.a));
-    }
+       //Rect half = {0,0,winSize.x,winSize.y/2};
+     //   SDL_FillRect(backgroundSurface,nullptr, SDL_MapRGBA(backgroundSurface->format,white.r,white.g,white.b,white.a));
+
 
 
 
@@ -164,16 +190,16 @@ void MortalFlawState::Render( const u32 frame, const u32 totalMSec, const float 
     //render game Objects
     renderFromSpritesheet(p->getXPos(),p->getYPos(),p->getWidth(),p->getHeight(),playerTexture,&playerClipRect);
     renderFromSpritesheet(p->getXPos(),p->getYPos(),p->getWidth(),p->getHeight(),playerFacingTexture, nullptr,
-                          p->getFacingAngle());
+                          p->getFacingAngleDouble());
     renderFromSpritesheet(enemyInstance->getRect(), enemyTexture);
 
 
     //we render cards from discard or burn until their usage ends and they set active back to false
     for(Card*e:p->discard) {
         if (e->active) {
-            renderFromSpritesheet(e->cardRect,cardDaggerTexture,&e->clip,p->getFacingAngle());
+            renderFromSpritesheet(e->cardRect,cardDaggerTexture,&e->clip,e->getAttackDirectionDouble());
 
-            //e->active = false;
+
         }
     }
 

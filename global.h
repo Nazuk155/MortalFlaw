@@ -19,7 +19,7 @@ const int SCREEN_HEIGHT = 960;
 
 
 // my added includes
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 
 //-----------------------
@@ -35,6 +35,7 @@ const int SCREEN_HEIGHT = 960;
 //#include <sstream>
 #include <string>
 #include <vector>
+#include <unordered_set>
 
 #include <fmt/core.h>   // https://fmt.dev/latest/index.html
 
@@ -49,8 +50,7 @@ const int SCREEN_HEIGHT = 960;
 #include <SDL_image.h>
 #include <SDL_mixer.h>
 
-///Maybe put this in a AngleHelper.h
-// added enum class Angle
+
 
 
 using i8    = std::int8_t;

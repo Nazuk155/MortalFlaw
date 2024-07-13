@@ -12,8 +12,8 @@ ExampleGame::ExampleGame()
         allStates = {
 
 
-                new IntroState  ( *this, render ),   // 0
-                new PlasmaState ( *this, render ),
+             //   new IntroState  ( *this, render ),   // 0
+               // new PlasmaState ( *this, render ),
                 new MortalFlawState(*this,render)};
 
     /*   // 1
