@@ -51,8 +51,14 @@ const int SCREEN_HEIGHT = 960;
 #include <SDL_image.h>
 #include <SDL_mixer.h>
 
-
-
+//little struct to give enemy IDs with their collision rects into cards in case they are needed
+struct Hitbox
+{
+    SDL_Rect collisionRect;
+    int hitboxID;
+}
+//all card names are saved here
+enum class eCardName{Dagger,Sword};
 
 using i8    = std::int8_t;
 using i16   = std::int16_t;

@@ -91,9 +91,12 @@ bool Player::useCard(Card ** slot)
         if(!(*slot)->active) {
            // Point p = {pos.x+12,pos.y};
             (*slot)->castCard(getFacingAngle(), pos);
-            addCardToDiscard(*slot);
-            //discard.push_back(*slot);
-            *slot = nullptr;
+            if((*slot)->ammo <= 0) {
+                addCardToDiscard(*slot);
+                (*slot)->ammo = (*slot)->maxUses;
+                //discard.push_back(*slot);
+                *slot = nullptr;
+            }
         }
         return true;
     }
@@ -167,8 +170,8 @@ void Player::drawCard()
 void Player::handleEvent( SDL_Event& e )
 {
 
-//using enum Angle; too much time was wasted trying to get this to work.
-//can not get this enum namespace to work in any way. I tried updating compilers and more. Alas my directions come with Angle:: for now
+//using enum eFacingAngle; too much time was wasted trying to get this to work.
+//can not get this enum namespace to work in any way. I tried updating compilers and more. Alas my directions come with eFacingAngle:: for now
 
     //If a key was pressed
     static bool w=false,a=false,s=false,d=false;
@@ -189,10 +192,10 @@ void Player::handleEvent( SDL_Event& e )
             case SDLK_LEFT:triggerSlot(HandPosition::L);break;
             case SDLK_UP:triggerSlot(HandPosition::M);break;
             case SDLK_RIGHT:triggerSlot(HandPosition::R);break;
-            case SDLK_w: VelY -= playerVel;currentAngle =Angle::Up;w=true; break;
-            case SDLK_s: VelY += playerVel;currentAngle =Angle::Down;s=true; break;
-            case SDLK_a: VelX -= playerVel;currentAngle =Angle::Left;a=true;break;
-            case SDLK_d: VelX += playerVel;currentAngle =Angle::Right;d=true; break;
+            case SDLK_w: VelY -= playerVel;currentAngle =eFacingAngle::Up;w=true; break;
+            case SDLK_s: VelY += playerVel;currentAngle =eFacingAngle::Down;s=true; break;
+            case SDLK_a: VelX -= playerVel;currentAngle =eFacingAngle::Left;a=true;break;
+            case SDLK_d: VelX += playerVel;currentAngle =eFacingAngle::Right;d=true; break;
         }
     }
         //If a key was released
@@ -214,43 +217,43 @@ void Player::handleEvent( SDL_Event& e )
 
     //really dumb but it works
     /*
-    if(w && d){ currentAngle = Angle::UpRight;}
-    if(w&&!d&&!s&&!a){currentAngle = Angle::Up;}
-    if(!w&&d&&!s&&!a){currentAngle = Angle::Right;}
+    if(w && d){ currentAngle = eFacingAngle::UpRight;}
+    if(w&&!d&&!s&&!a){currentAngle = eFacingAngle::Up;}
+    if(!w&&d&&!s&&!a){currentAngle = eFacingAngle::Right;}
 
-    if(s && d){ currentAngle = Angle::DownRight;}
-    if(s&&!d&&!a&&!w){currentAngle = Angle::Down;}
-    if(!s&&d&&!a&&!w){currentAngle = Angle::Right;}
+    if(s && d){ currentAngle = eFacingAngle::DownRight;}
+    if(s&&!d&&!a&&!w){currentAngle = eFacingAngle::Down;}
+    if(!s&&d&&!a&&!w){currentAngle = eFacingAngle::Right;}
 
-    if(w&&a){currentAngle = Angle::UpLeft;}
-    if(w&&!a&&!s&&!d){currentAngle = Angle::Up;}
-    if(!w&&a&&!s&&!d){currentAngle = Angle::Left;}
+    if(w&&a){currentAngle = eFacingAngle::UpLeft;}
+    if(w&&!a&&!s&&!d){currentAngle = eFacingAngle::Up;}
+    if(!w&&a&&!s&&!d){currentAngle = eFacingAngle::Left;}
 
-    if(s&&a){currentAngle = Angle::DownLeft;}
-    if(s&&!a&&!w&&!d){currentAngle = Angle::Down;}
-    if(!s&&a&&!w&&!d){currentAngle = Angle::Left;}
+    if(s&&a){currentAngle = eFacingAngle::DownLeft;}
+    if(s&&!a&&!w&&!d){currentAngle = eFacingAngle::Down;}
+    if(!s&&a&&!w&&!d){currentAngle = eFacingAngle::Left;}
     */
     //made it pretty
     if (w) {
         if (d) {
-            currentAngle = Angle::UpRight;
+            currentAngle = eFacingAngle::UpRight;
         } else if (a) {
-            currentAngle = Angle::UpLeft;
+            currentAngle = eFacingAngle::UpLeft;
         } else {
-            currentAngle = Angle::Up;
+            currentAngle = eFacingAngle::Up;
         }
     } else if (s) {
         if (d) {
-            currentAngle = Angle::DownRight;
+            currentAngle = eFacingAngle::DownRight;
         } else if (a) {
-            currentAngle = Angle::DownLeft;
+            currentAngle = eFacingAngle::DownLeft;
         } else {
-            currentAngle = Angle::Down;
+            currentAngle = eFacingAngle::Down;
         }
     } else if (d) {
-        currentAngle = Angle::Right;
+        currentAngle = eFacingAngle::Right;
     } else if (a) {
-        currentAngle = Angle::Left;
+        currentAngle = eFacingAngle::Left;
     }
 
 
@@ -258,19 +261,19 @@ void Player::handleEvent( SDL_Event& e )
     /*
     if( currentKeyStates[ SDL_SCANCODE_W ]&&currentKeyStates[SDL_SCANCODE_D] )
     {
-        currentAngle=Angle::UpRight;
+        currentAngle=eFacingAngle::UpRight;
     }
     if( currentKeyStates[ SDL_SCANCODE_S ]&&currentKeyStates[SDL_SCANCODE_D] )
     {
-        currentAngle=Angle::DownRight;
+        currentAngle=eFacingAngle::DownRight;
     }
     if( currentKeyStates[ SDL_SCANCODE_W ]&&currentKeyStates[SDL_SCANCODE_A] )
     {
-        currentAngle=Angle::UpLeft;
+        currentAngle=eFacingAngle::UpLeft;
     }
     if( currentKeyStates[ SDL_SCANCODE_S ]&&currentKeyStates[SDL_SCANCODE_A] )
     {
-        currentAngle=Angle::DownLeft;
+        currentAngle=eFacingAngle::DownLeft;
     }
      */
     //button modifier idea
@@ -282,7 +285,7 @@ void Player::handleEvent( SDL_Event& e )
      */
 }
 
-void Player::move(const Vector<Rect>& colliderList)
+void Player::move(const Vector<Hitbox>& colliderList)
 {
     //Move the Player left or right
 
@@ -291,7 +294,7 @@ void Player::move(const Vector<Rect>& colliderList)
 
     //If the Player went too far to the left or right and check collision list
     for(auto a:colliderList) {
-        if ((pos.x < 0) || (pos.x + PLAYER_WIDTH > SCREEN_WIDTH) || SDL_HasIntersection(&collisionRect,&a)) {
+        if ((pos.x < 0) || (pos.x + PLAYER_WIDTH > SCREEN_WIDTH) || SDL_HasIntersection(&collisionRect,&a.collisionRect)) {
             //Move back
             pos.x -= VelX;
             collisionRect.x -= VelX;
@@ -304,7 +307,7 @@ void Player::move(const Vector<Rect>& colliderList)
     //If the Player went too far up or down and check collision list
     for(auto a:colliderList) {
         if ((pos.y < 0) || (pos.y + PLAYER_HEIGHT > SCREEN_HEIGHT)|| SDL_HasIntersection(&collisionRect,
-                                                                                       (const SDL_Rect *) &a)) {
+                                                                                       &a.collisionRect)) {
             //Move back
             pos.y -= VelY;
             collisionRect.y -= VelY;
@@ -316,7 +319,7 @@ void Player::move(const Vector<Rect>& colliderList)
 double Player::getFacingAngleDouble() const {
     return static_cast<double>(static_cast<int>(currentAngle));
 }
-Angle Player::getFacingAngle() const {return currentAngle;}
+eFacingAngle Player::getFacingAngle() const {return currentAngle;}
 
 
 int Player::getXPos() const{return pos.x;}

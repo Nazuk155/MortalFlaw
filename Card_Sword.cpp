@@ -3,9 +3,13 @@
 //
 
 
-#include "Card_Dagger.h"
+#include "Card_Sword.h"
 
-Card_Dagger::Card_Dagger(
+
+// Override castCard method implementation
+
+
+Card_Sword::Card_Sword(
         u8 dmg,
         u16 range,
         int squaredRange,
@@ -21,40 +25,42 @@ Card_Dagger::Card_Dagger(
         u8 state,
         eCardName name,
         int maxUses)
-                         : Card(dmg, range, squaredRange, ammo, active, attackDirection, cardRect, clip,
-                                startingPos, velocity, maxTargets, applyStatus, state, name, maxUses) {
+        : Card(dmg, range, squaredRange, ammo, active, attackDirection, cardRect, clip,
+               startingPos, velocity, maxTargets, applyStatus, state, name, maxUses) {
 
-        this->squaredRange = this->range * this->range;
+    this->squaredRange = this->range * this->range;
 
 }
-void Card_Dagger::castCard(eFacingAngle aim, Point startingPoint) {
+void Card_Sword::castCard(eFacingAngle aim, Point startingPoint) {
 
     //set attack angle
     attackDirection = aim;
 
+    //manually adjust where the attack starts. very hacky but not time to do it right
+    int centerX = cardRect.x + cardRect.w / 2;
+    int centerY = cardRect.y + cardRect.h / 2;
 
-//maybe polish this logic up for each card later. Good enough for now
     switch (aim)
     {
-        case eFacingAngle::Up:startingPoint.x += cardRect.w;  startingPoint.y -= cardRect.w/2;break;
-        case eFacingAngle::Right:startingPoint.x += cardRect.w;startingPoint.y -=cardRect.w/2;break;
-        case eFacingAngle::Left:startingPoint.x += cardRect.w;startingPoint.y -= cardRect.w/2;break;
-        case eFacingAngle::Down:startingPoint.x += cardRect.w;break;
-        case eFacingAngle::UpRight:startingPoint.x += cardRect.w;startingPoint.y -= cardRect.w/2;break;
-        case eFacingAngle::DownLeft:startingPoint.x += cardRect.w;startingPoint.y -= cardRect.w/2;break;
-        case eFacingAngle::UpLeft:startingPoint.x += cardRect.w;startingPoint.y -= cardRect.w/2;;break;
-        case eFacingAngle::DownRight:startingPoint.x += cardRect.w;startingPoint.y -= cardRect.w/2;break;
+        case eFacingAngle::Up:startingPoint.x -= cardRect.w/3;startingPoint.y -=cardRect.w/6;break;
+        case eFacingAngle::Right:startingPoint.x -=cardRect.w/6;break;
+        case eFacingAngle::Left:startingPoint.x -=cardRect.w/2;break;
+        case eFacingAngle::Down:startingPoint.x -=cardRect.w/3;startingPoint.y += cardRect.w/6;break;
+        case eFacingAngle::UpRight:startingPoint.x -=cardRect.w/6;startingPoint.y -=cardRect.w/6;break;
+        case eFacingAngle::DownLeft:startingPoint.x -=cardRect.w/2;startingPoint.y +=cardRect.w/6;break;
+        case eFacingAngle::UpLeft:startingPoint.x -=cardRect.w/2;startingPoint.y -= cardRect.w/6;break;
+        case eFacingAngle::DownRight:startingPoint.x -=cardRect.w/6;startingPoint.y += cardRect.w/6;break;
     }
-
-    //current position of attack
     cardRect.x = startingPoint.x;
     cardRect.y = startingPoint.y;
-    //starting point from where it starts animating
+
     startingPos.x = cardRect.x;
     startingPos.y = cardRect.y;
-    if(state>3){state = 3;}
-    if(state>=3){ applyDebuff = true;}
-    Card::setSpritesheetClip(state);
+
+    //we dont use state because the instances only differ in color to distinguish
+    //-1 because spritesheet clips are between 0 to 2 * clip.x
+    Card::setSpritesheetClip(ammo - 1);
+
 
     ammo-- ;
     active = true;
@@ -66,7 +72,7 @@ void Card_Dagger::castCard(eFacingAngle aim, Point startingPoint) {
 /// TODO think of burning cards mechanics. Include Player in the specific cards to access their deck and add cards to the temporary deck that get deleted when inactive.
 //int Card_Dagger::doWhileIgnited(const Vector<Hitbox>& hitboxList,Player &p){ p.addCardtoDeck}
 
-int Card_Dagger::doWhileActive(const Vector<Hitbox>& colliderList) {
+int Card_Sword::doWhileActive(const Vector<Hitbox>& colliderList) {
 
     int hit = 0;
     int noHit = 999;
@@ -90,14 +96,10 @@ int Card_Dagger::doWhileActive(const Vector<Hitbox>& colliderList) {
                     if(hitIDSet.size() == maxTargets) {
                         active = false;
                         hitIDSet.clear();
-                        state ++;
-                        if(state>=3){ applyDebuff = true;}
+
 
                     }
-                    state ++;
-                    if(state>3){state = 3;}
-                    Card::setSpritesheetClip(state);
-                    if(state>=3){ applyDebuff = true;}
+
                     return hit;
                 }
 
@@ -109,18 +111,17 @@ int Card_Dagger::doWhileActive(const Vector<Hitbox>& colliderList) {
             active = false;
             hitIDSet.clear();
 
-            if(state>=3){ applyDebuff = true;}
+
             return noHit;
 
         }
-        if(state>=3){ applyDebuff = true;}
         return noHit;
     }
     else{ printf("Card %d not active in doWhileActive for some reason?!",cID);}
     return -1;
 }
 
-void Card_Dagger::move()
+void Card_Sword::move()
 {
     const double sqrt2_over_2 = std::sqrt(2) / 2;  // Precomputed value for cos(45 degrees) and sin(45 degrees)
     // remember the y axis is inverted due to SDL
@@ -156,4 +157,7 @@ void Card_Dagger::move()
     }
 }
 
-Card_Dagger::~Card_Dagger()= default;
+
+
+
+Card_Sword::~Card_Sword()= default;

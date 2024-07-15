@@ -39,6 +39,8 @@ add_executable(FreshMortalFlaw
         Card.h
         Card_Dagger.cpp
         Card_Dagger.h
+        Card_Sword.cpp
+        Card_Sword.h
 
 
 )

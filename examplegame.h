@@ -13,6 +13,7 @@
 #include "Player.h"
 #include <Enemy.h>
 #include <Card_Dagger.h>
+#include <Card_Sword.h>
 
 class ExampleGame;
 class IntroState;
@@ -44,11 +45,12 @@ protected:
     Chunk   * sound             = nullptr;
 
     //textures
-    Texture * playerTexture     = nullptr;
-    Texture * enemyTexture      = nullptr;
-    Texture * playerFacingTexture      = nullptr;
-    Texture * cardDaggerTexture = nullptr;
-    Texture * blendedText       = nullptr;
+    Texture * playerTexture          = nullptr;
+    Texture * enemyTexture           = nullptr;
+    Texture * playerFacingTexture    = nullptr;
+    Texture * cardDaggerTexture      = nullptr;
+    Texture * cardSwordTexture       = nullptr;
+    Texture * blendedText            = nullptr;
 
 
     Point     blendedTextSize   = { 0, 0 };
@@ -59,12 +61,15 @@ protected:
     std::vector<Enemy*> enemyVec;
 
     Player *p;
-    //standard player size is 32x32
+    //standard player size is 32x32.
+    ///TODO give player a clip rect
     Rect playerClipRect = {64,0,64,64};
+
     //collision table
-    std::vector< SDL_Rect > colliderVec;
+    std::vector< Hitbox > colliderVec;
 
 
+    //colors
     static constexpr const Color white { 255, 255, 255, 255 };
     static constexpr const Color black { 0, 0, 0, 255 };
 
@@ -81,7 +86,7 @@ public:
 
     //new functions
 
-
+//helper function for SDL_RenderCopyEx
     void renderFromSpritesheet(int targetX,
                                int targetY,
                                int targetW,
@@ -102,6 +107,7 @@ public:
                                SDL_RendererFlip flip = SDL_FLIP_NONE,
                                bool useClipSize = false);
 
+    //helper for SDL_CreateTextureFromSurface, applys a color key r:0, g:0xFF,b:0xFF if transparent pixels are ever needed
     Texture* loadFromFile(const std::string& path);
 };
 
@@ -151,6 +157,9 @@ public:
     void Update( const u32 frame, const u32 totalMSec, const float deltaT ) override;
     void Render( const u32 frame, const u32 totalMSec, const float deltaT ) override;
 };
+
+
+//------------ left the old states in for testing
 
 class PlasmaState final : public IntroState
 {

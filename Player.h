@@ -41,7 +41,7 @@ public:
     void handleEvent( SDL_Event& e );
 
     //Moves the dot
-    void move(const Vector<Rect>& colliderList);
+    void move(const Vector<Hitbox>& colliderList);
 
 
 
@@ -63,7 +63,7 @@ public:
     //getter Methods
     //returns angle in 45 degree steps for rendering rotated sprites based on currentAngle
     [[nodiscard]] double getFacingAngleDouble() const;
-    [[nodiscard]] Angle getFacingAngle() const;
+    [[nodiscard]] eFacingAngle getFacingAngle() const;
     [[nodiscard]] int getXPos() const;
     [[nodiscard]] int getYPos() const;
     [[nodiscard]] Point * getPoint();
@@ -90,7 +90,7 @@ private:
     //Spritesheet clipper box
     Rect clip;
     // enum of facing direction of player
-    Angle currentAngle;
+    eFacingAngle currentAngle;
 
 
 };

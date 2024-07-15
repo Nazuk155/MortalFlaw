@@ -9,6 +9,7 @@
 
 #include "Card.h"
 #include <Player.h>
+#include <unordered_set>
 
 
 class Card_Dagger : public Card {
@@ -16,20 +17,25 @@ public:
     // Constructor
 
       explicit Card_Dagger(
-                         u8 dmg = 1,
-                         u16 range = 400,
-                         int squaredRange = 0,
-                         u8 uses = 3,
-                         bool active = false,
-                         Angle attackDirection = Angle::Up,
-                         Rect cardRect ={0,0,12,49},
-                         Rect clip = {0,0,12,49},
-                         Point startingPos = {0,0},
-                         Point velocity = {20,20});
+              u8 dmg = 1,
+              u16 range = 400,
+              int squaredRange = 0,
+              u8 ammo = 1,
+              bool active = false,
+              eFacingAngle attackDirection = eFacingAngle::Up,
+              Rect cardRect ={0,0,12,49},
+              Rect clip = {0,0,12,49},
+              Point startingPos = {0,0},
+              Point velocity = {20,20},
+              int maxTargets = 3,
+              bool applyStatus = false,
+              u8 state = 0,
+              eCardName name = eCardName::Dagger,
+              int maxUses = 1);
 
     // Override the castCard method
-    void castCard(Angle aim, Point startingPoint) override;
-    int doWhileActive(const Vector<Rect>& colliderList) override;
+    void castCard(eFacingAngle aim, Point startingPoint) override;
+    int doWhileActive(const Vector<Hitbox>& colliderList) override;
     void move() override;
     ~Card_Dagger() override;
 };

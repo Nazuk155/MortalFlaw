@@ -8,71 +8,71 @@
 
 
 // Overload the + operator to add two angles
-    Angle operator+(Angle a1, Angle a2) {
+    eFacingAngle operator+(eFacingAngle a1, eFacingAngle a2) {
         int sum = static_cast<int>(a1) + static_cast<int>(a2);
         // Normalize the angle to be within [0, 360)
         sum %= 360;
 
-        // Convert the sum back to an Angle enum
+        // Convert the sum back to an eFacingAngle enum
         switch (sum) {
             case 360:
-                return Angle::Up;
+                return eFacingAngle::Up;
             case 45:
-                return Angle::UpRight;
+                return eFacingAngle::UpRight;
             case 90:
-                return Angle::Right;
+                return eFacingAngle::Right;
             case 135:
-                return Angle::DownRight;
+                return eFacingAngle::DownRight;
             case 180:
-                return Angle::Down;
+                return eFacingAngle::Down;
             case 225:
-                return Angle::DownLeft;
+                return eFacingAngle::DownLeft;
             case 270:
-                return Angle::Left;
+                return eFacingAngle::Left;
             case 315:
-                return Angle::UpLeft;
+                return eFacingAngle::UpLeft;
             default:
                 throw std::invalid_argument("Invalid angle sum");
         }
     }
 
 // Overload the += operator to add an angle to the current angle
-    Angle &operator+=(Angle &a1, Angle a2) {
+    eFacingAngle &operator+=(eFacingAngle &a1, eFacingAngle a2) {
         a1 = a1 + a2;
         return a1;
     }
 
 // Overload the - operator to subtract two angles
-    Angle operator-(Angle a1, Angle a2) {
+    eFacingAngle operator-(eFacingAngle a1, eFacingAngle a2) {
         int diff = static_cast<int>(a1) - static_cast<int>(a2);
         // Normalize the angle to be within [0, 360)
         diff = (diff + 360) % 360;
 
-        // Convert the diff back to an Angle enum
+        // Convert the diff back to an eFacingAngle enum
         switch (diff) {
             case 0:
-                return Angle::Up;
+                return eFacingAngle::Up;
             case 45:
-                return Angle::UpRight;
+                return eFacingAngle::UpRight;
             case 90:
-                return Angle::Right;
+                return eFacingAngle::Right;
             case 135:
-                return Angle::DownRight;
+                return eFacingAngle::DownRight;
             case 180:
-                return Angle::Down;
+                return eFacingAngle::Down;
             case 225:
-                return Angle::DownLeft;
+                return eFacingAngle::DownLeft;
             case 270:
-                return Angle::Left;
+                return eFacingAngle::Left;
             case 315:
-                return Angle::UpLeft;
+                return eFacingAngle::UpLeft;
             default:
                 throw std::invalid_argument("Invalid angle difference");
         }
     }
 
 // Overload the -= operator to subtract an angle from the current angle
-    Angle &operator-=(Angle &a1, Angle a2) {
+    eFacingAngle &operator-=(eFacingAngle &a1, eFacingAngle a2) {
         a1 = a1 - a2;
         return a1;
     }

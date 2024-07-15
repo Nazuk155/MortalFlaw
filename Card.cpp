@@ -9,14 +9,47 @@
 int Card::nextID = 1;
 
 // Constructor implementation
-Card::Card( u8 dmg, u16 range, int squaredRange, u8 use, bool act, Angle attackDirection, Rect cardRect,
+Card::Card(u8 dmg,
+           u16 range,
+           int squaredRange,
+           u8 ammo,
+           bool act,
+           eFacingAngle attackDirection,
+           Rect cardRect,
            Rect clip,
-           Point startingPos, Point velocity):cID(nextID++),dmg(dmg),range(range),squaredRange(squaredRange),uses(use),active(act),attackDirection(attackDirection),
-                                              cardRect(cardRect),clip(clip), startingPos(startingPos),velocity(velocity) {}
+           Point startingPos,
+           Point velocity,
+           int maxTargets,
+           bool applyStatus,
+           u8 state,
+           eCardName cardName,
+           int maxUses)
+
+            : cID(nextID++),
+              dmg(dmg),
+              range(range),
+              squaredRange(squaredRange),
+              ammo(ammo),
+              active(act),
+              attackDirection(attackDirection),
+              cardRect(cardRect),
+              clip(clip),
+              startingPos(startingPos),
+              velocity(velocity),
+              maxTargets(maxTargets),
+              applyDebuff(applyStatus),
+              state(state),
+              cardName(cardName),
+              maxUses(maxUses){}
+
 
 Card::Card()
-        : cID(nextID++), dmg(0), range(0), squaredRange(0), uses(0), active(false) {}
+        : cID(nextID++), dmg(0), range(0), squaredRange(0), ammo(0), active(false) {}
 
+void Card::setSpritesheetClip(int spriteNr) {
+    clip.x = clip.w*spriteNr;
+
+}
 
 
 // Pure virtual destructor needs a definition

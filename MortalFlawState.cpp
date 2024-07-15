@@ -22,10 +22,11 @@ void MortalFlawState::Init()
 
 
     //------------ Asset Paths
-    std::string playerPath = BaseFolder "Ressources/Assets/Player/Player_Spritesheets/Player_Sprite_Bases_Bigger.png";
-    std::string playerFacingPath = BaseFolder "Ressources/Assets/Player/Player_Indicators/Player_Facing_Direction_Indicator.png";
-    std::string enemyPath  = BaseFolder "Ressources/Assets/Enemy/Enemy_Sprite_Bases.bmp";
-    std::string cardDaggerPath = BaseFolder "/Ressources/Assets/Attacks/DAGGER/Fire_Dagger_Trimmed_Spritesheet.png";
+    std::string playerPath       =   BaseFolder "Ressources/Assets/Player/Player_Spritesheets/Player_Sprite_Bases_Bigger.png";
+    std::string playerFacingPath =   BaseFolder "Ressources/Assets/Player/Player_Indicators/Player_Facing_Direction_Indicator.png";
+    std::string enemyPath        =   BaseFolder "Ressources/Assets/Enemy/Enemy_Sprite_Bases.bmp";
+    std::string cardDaggerPath   =   BaseFolder "/Ressources/Assets/Attacks/DAGGER/Fire_Dagger_Trimmed_Spritesheet.png";
+    std::string cardSwordPath    =   BaseFolder "/Ressources/Assets/Attacks/SWORD/Player_Attack_Sword_Slash_Colors_Spritesheet.png";
 
     //----------------
 
@@ -36,10 +37,16 @@ void MortalFlawState::Init()
     p->setYPos(100);
 
     //add cards to deck
-    for(int i = 0;i<10;i++){
-        p->addCardToDeck(new Card_Dagger);
+    for(int i = 0;i<3;i++){
+        p->addCardToDeck(new Card_Sword);
        // printf("cID = %d",p->deck.back()->cID);
        // p->deck.push_back(new Card_Dagger);
+        p->drawCard();
+    }
+    for(int i = 0;i<3;i++){
+        p->addCardToDeck(new Card_Dagger);
+        // printf("cID = %d",p->deck.back()->cID);
+        // p->deck.push_back(new Card_Dagger);
         p->drawCard();
     }
     //set initial card render position
@@ -55,8 +62,9 @@ void MortalFlawState::Init()
     for(int i= 0;i<10;i++){
        auto *temp = new Enemy();
         enemyVec.push_back(temp);
+        print("Enemy ID = %d",enemyVec.back()->getID());
     }
-
+    enemyVec.push_back(enemyInstance);
     /*
     if(!playerTexture)
     {
@@ -67,11 +75,14 @@ void MortalFlawState::Init()
 */
     SDL_SetRenderDrawColor( render, 0xFF, 0xFF, 0xFF, 0xFF );
 
+//--------------- load textures from file
+    playerTexture        = loadFromFile(playerPath);
+    enemyTexture         = loadFromFile(enemyPath);
+    playerFacingTexture  = loadFromFile(playerFacingPath);
+    cardDaggerTexture    = loadFromFile(cardDaggerPath);
+    cardSwordTexture     = loadFromFile(cardSwordPath);
+//---------------
 
-    playerTexture = loadFromFile(playerPath);
-    enemyTexture = loadFromFile(enemyPath);
-    playerFacingTexture = loadFromFile(playerFacingPath);
-    cardDaggerTexture = loadFromFile(cardDaggerPath);
 
     const Point & winSize = game.GetWindowSize();
     const Point resolution = winSize ;
@@ -88,10 +99,12 @@ void MortalFlawState::UnInit()
     SDL_DestroyTexture(enemyTexture);
     SDL_DestroyTexture(playerFacingTexture);
     SDL_DestroyTexture(cardDaggerTexture);
+    SDL_DestroyTexture(cardSwordTexture);
     playerFacingTexture = nullptr;
     playerTexture = nullptr;
     enemyTexture = nullptr;
     cardDaggerTexture = nullptr;
+    cardSwordTexture = nullptr;
 }
 
 void MortalFlawState::Events( const u32 frame, const u32 totalMSec, const float deltaT )
@@ -117,11 +130,13 @@ void MortalFlawState::Events( const u32 frame, const u32 totalMSec, const float 
 }
 void MortalFlawState::Update( const u32 frame, const u32 totalMSec, const float deltaT ) {
 
-
+    //draw cards before handling events to update the vectors before operations happen on them
     p->drawCard();
+
+
     //testing velocity
     //enemyInstance->setVelocity(2, 2);
-    enemyInstance->setXPos(100);
+
     enemyInstance->move();
 
     //testing multiple enemy movement and update collider list
@@ -133,13 +148,13 @@ void MortalFlawState::Update( const u32 frame, const u32 totalMSec, const float 
         a->setVelocity(0, plus);
         a->move();
         //update collision box table
-        colliderVec.push_back(a->getRect());
+        colliderVec.push_back(a->getHitbox());
         plus++;
 
     }
-    colliderVec.push_back(enemyInstance->getRect());
+    colliderVec.push_back(enemyInstance->getHitbox());
     ///TODO add the discard and burn for loop to iterate through the instances of that are active and start their doWhileActive
-    //Vector activeCards collects all cards with active = true and triggers their doWhileActive
+
 
     std::unordered_set<int> activeIDs;
     activeIDs.clear();
@@ -160,6 +175,11 @@ void MortalFlawState::Update( const u32 frame, const u32 totalMSec, const float 
                  * on hit the hitIDSet adds the enemy to its list so it can not be hit again
                  * hitIDSet resets when active time of card ends
                  * */
+
+                if(e->applyDebuff)
+                {
+                    enemyVec[hits]->setDebuff(1);
+                }
 
 
                 printf("enemy vec X pos %d", enemyVec[hits]->getRect().x);
@@ -185,6 +205,11 @@ void MortalFlawState::Update( const u32 frame, const u32 totalMSec, const float 
                  * hitIDSet resets when active time of card ends
                  * */
 
+                if(e->applyDebuff)
+                {
+                    enemyVec[hits]->setDebuff(1);
+                }
+
 
                 printf("enemy vec X pos %d", enemyVec[hits]->getRect().x);
                 enemyVec[hits]->setXPos(enemyVec[hits]->getRect().x + 100);
@@ -209,6 +234,11 @@ void MortalFlawState::Update( const u32 frame, const u32 totalMSec, const float 
                  * hitIDSet resets when active time of card ends
                  * */
 
+
+                if(e->applyDebuff)
+                {
+                    enemyVec[hits]->setDebuff(1);
+                }
 
                 printf("enemy vec X pos %d", enemyVec[hits]->getRect().x);
                 enemyVec[hits]->setXPos(enemyVec[hits]->getRect().x + 100);
@@ -261,31 +291,56 @@ void MortalFlawState::Render( const u32 frame, const u32 totalMSec, const float 
     renderFromSpritesheet(p->getXPos(),p->getYPos(),p->getWidth(),p->getHeight(),playerTexture,&playerClipRect);
     renderFromSpritesheet(p->getXPos(),p->getYPos(),p->getWidth(),p->getHeight(),playerFacingTexture, nullptr,
                           p->getFacingAngleDouble());
-    renderFromSpritesheet(enemyInstance->getRect(), enemyTexture);
+   // renderFromSpritesheet(enemyInstance->getRect(), enemyTexture);
 
 
     //we render cards from discard or burn until their usage ends and they set active back to false
     for(Card*e:p->discard) {
         if (e->active) {
-            renderFromSpritesheet(e->cardRect,cardDaggerTexture,&e->clip,e->getAttackDirectionDouble());
+            switch(static_cast<int>(e->cardName))
+            {
+                case static_cast<int>(eCardName::Dagger):
+                    renderFromSpritesheet(e->cardRect,cardDaggerTexture,&e->clip,e->getAttackDirectionDouble());break;
+                case static_cast<int>(eCardName::Sword):
+                    renderFromSpritesheet(e->cardRect,cardSwordTexture,&e->clip,e->getAttackDirectionDouble());break;
+
+            }
+
+
         }
     }
 
 
     for(Card*e:p->deck) {
         if (e->active) {
-            renderFromSpritesheet(e->cardRect,cardDaggerTexture,&e->clip,e->getAttackDirectionDouble());
+            switch(static_cast<int>(e->cardName))
+            {
+                case static_cast<int>(eCardName::Dagger):
+                    renderFromSpritesheet(e->cardRect,cardDaggerTexture,&e->clip,e->getAttackDirectionDouble());break;
+                case static_cast<int>(eCardName::Sword):
+                    renderFromSpritesheet(e->cardRect,cardSwordTexture,&e->clip,e->getAttackDirectionDouble());break;
+
+            }
         }
     }
     for(Card*e:p->hand) {
         if (e != nullptr &&e->active) {
-            renderFromSpritesheet(e->cardRect,cardDaggerTexture,&e->clip,e->getAttackDirectionDouble());
+            switch(static_cast<int>(e->cardName))
+            {
+                case static_cast<int>(eCardName::Dagger):renderFromSpritesheet(e->cardRect,cardDaggerTexture,&e->clip,e->getAttackDirectionDouble());break;
+                case static_cast<int>(eCardName::Sword):renderFromSpritesheet(e->cardRect,cardSwordTexture,&e->clip,e->getAttackDirectionDouble());break;
+
+            }
         }
     }
 
     //render the enemy vector
     for(Enemy *a:enemyVec){
         renderFromSpritesheet(a->getRect(),enemyTexture);
+        if(a->burn)
+        {
+            renderFromSpritesheet(a->getRect(),cardDaggerTexture,nullptr);
+        }
     }
 
     SDL_RenderPresent( render );
@@ -328,6 +383,7 @@ Texture* MortalFlawState::loadFromFile(const std::string& path){
 
     Texture * newTexture = nullptr;
     Surface * loadedSurface =  IMG_Load(path.c_str());
+
     if( loadedSurface == nullptr )
     {
         printf( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );

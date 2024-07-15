@@ -2,7 +2,7 @@
 #define ANGLE_HELPER_H
 #include <global.h>
 
-enum class Angle {
+enum class eFacingAngle {
     Up = 0,
     UpRight = 45,
     Right = 90,
@@ -13,9 +13,9 @@ enum class Angle {
     UpLeft = 315
 };
 
-Angle operator+(Angle a1, Angle a2);
-Angle& operator+=(Angle& a1, Angle a2);
-Angle operator-(Angle a1, Angle a2);
-Angle& operator-=(Angle& a1, Angle a2);
+eFacingAngle operator+(eFacingAngle a1, eFacingAngle a2);
+eFacingAngle& operator+=(eFacingAngle& a1, eFacingAngle a2);
+eFacingAngle operator-(eFacingAngle a1, eFacingAngle a2);
+eFacingAngle& operator-=(eFacingAngle& a1, eFacingAngle a2);
 
 #endif // ANGLE_HELPER_H
