@@ -58,7 +58,6 @@ protected:
     //multiple enemies
     std::vector<Enemy*> enemyVec;
 
-
     Player *p;
     //standard player size is 32x32
     Rect playerClipRect = {64,0,64,64};

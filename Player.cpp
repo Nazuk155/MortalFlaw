@@ -4,7 +4,8 @@
 
 #include "Player.h"
 
-
+//set aimingMode toggle to off
+bool Player::aimingMode = false;
 
 Player::Player()
 {
@@ -18,10 +19,12 @@ Player::Player()
     VelX = 0;
     VelY = 0;
 
-   collisionRect  = {pos.x,pos.y,PLAYER_WIDTH,PLAYER_HEIGHT};
-   hand.push_back(nullptr);
-   hand.push_back(nullptr);
-   hand.push_back(nullptr);
+    collisionRect  = {pos.x,pos.y,PLAYER_WIDTH,PLAYER_HEIGHT};
+
+    //initialize hand with 3 slots
+    hand.push_back(nullptr);
+    hand.push_back(nullptr);
+    hand.push_back(nullptr);
 
 
 }
@@ -30,7 +33,36 @@ void Player::addCardToDeck(Card * newCard)
     if(newCard != nullptr) {
         deck.push_back(newCard);
     }
-    else{ printf("addCard failed due to nullptr");}
+    else
+    {
+        printf("addCard failed due to nullptr");
+    }
+
+}
+
+void Player::addCardToDiscard(Card * addedCard)
+{
+    if(addedCard != nullptr) {
+        discard.push_back(addedCard);
+    }
+    else
+    {
+        printf("ToDiscard failed due to nullptr");
+    }
+}
+void Player::shuffleDiscardIntoDeck(bool shuffle)
+{
+    if(shuffle) {
+        auto rd = std::random_device{};
+        auto rng = std::default_random_engine{rd()};
+        std::shuffle(std::begin(discard), std::end(discard), rng);
+    }
+    auto size = discard.size();
+    for(auto i = 0; i<size; i++)
+    {
+        addCardToDeck(discard.back());
+        discard.pop_back();
+    }
 
 }
 
@@ -38,16 +70,16 @@ void Player::triggerSlot(HandPosition id) {
 
     switch (id) {
         case HandPosition::L:
-            //useCard(&hand[0]);
-            useCard(&slotLeft);
+            useCard(&hand[0]);
+           // useCard(&slotLeft);
             break;
         case HandPosition::M:
-           // useCard(&hand[1]);
-            useCard(&slotMiddle);
+            useCard(&hand[1]);
+           // useCard(&slotMiddle);
             break;
         case HandPosition::R:
-           // useCard(&hand[2]);
-           useCard(&slotRight);
+            useCard(&hand[2]);
+          // useCard(&slotRight);
             break;
     }
 }
@@ -56,10 +88,13 @@ void Player::triggerSlot(HandPosition id) {
 bool Player::useCard(Card ** slot)
 {
     if(*slot != nullptr) {
-        (*slot)->castCard(getFacingAngle(), pos);
-
-        discard.push_back(*slot);
-        *slot = nullptr;
+        if(!(*slot)->active) {
+           // Point p = {pos.x+12,pos.y};
+            (*slot)->castCard(getFacingAngle(), pos);
+            addCardToDiscard(*slot);
+            //discard.push_back(*slot);
+            *slot = nullptr;
+        }
         return true;
     }
     return false;
@@ -71,17 +106,22 @@ void Player::drawCard()
 {
     //ugly but no time to refactor
     //handsize never changes so this is fine
-    /*
+
     for(int i = 0;i<3;i++) {
+        if(deck.empty() && !discard.empty())
+        {
+            shuffleDiscardIntoDeck(false);
+        }
         if (!deck.empty()) {
             if (hand[i] == nullptr) {
                 drawsReady -= 1;
-                hand[i] = deck[0];
+                hand[i] = deck.back();
                 deck.pop_back();
             }
         }
     }
-    */
+
+    /*
     if(slotLeft == nullptr)
     {
         if(drawsReady>0 && !deck.empty())
@@ -109,7 +149,7 @@ void Player::drawCard()
             deck.pop_back();
         }
     }
-
+*/
 
 }
 
@@ -121,8 +161,11 @@ void Player::handleEvent( SDL_Event& e )
 
     //If a key was pressed
     static bool w=false,a=false,s=false,d=false;
+
     const Uint8* currentKeyStates = SDL_GetKeyboardState(nullptr );
 
+    //aimingMode standstill toggle
+    if(aimingMode){ playerVel = 0;VelX = 0; VelY = 0;}else{ playerVel = 5;}
 
     if( e.type == SDL_KEYDOWN && e.key.repeat == 0 )
     {
@@ -131,14 +174,14 @@ void Player::handleEvent( SDL_Event& e )
         switch( e.key.keysym.sym )
         {
             ///maybe display a aiming line on press and fire on release?
-           // case SDLK_SPACE:VelY = VelY/2;VelX = VelX/2;break; cant do it like this for obvious reasons. better modify the move() with an additional toggle
+            case SDLK_SPACE:if(!aimingMode){ aimingMode = true;}else{ aimingMode = false;} break; // cant do it like this for obvious reasons. better modify the move() with an additional toggle
             case SDLK_LEFT:triggerSlot(HandPosition::L);break;
             case SDLK_UP:triggerSlot(HandPosition::M);break;
             case SDLK_RIGHT:triggerSlot(HandPosition::R);break;
-            case SDLK_w: VelY -= PLAYER_VEL;currentAngle =Angle::Up;w=true; break;
-            case SDLK_s: VelY += PLAYER_VEL;currentAngle =Angle::Down;s=true; break;
-            case SDLK_a: VelX -= PLAYER_VEL;currentAngle =Angle::Left;a=true;break;
-            case SDLK_d: VelX += PLAYER_VEL;currentAngle =Angle::Right;d=true; break;
+            case SDLK_w: VelY -= playerVel;currentAngle =Angle::Up;w=true; break;
+            case SDLK_s: VelY += playerVel;currentAngle =Angle::Down;s=true; break;
+            case SDLK_a: VelX -= playerVel;currentAngle =Angle::Left;a=true;break;
+            case SDLK_d: VelX += playerVel;currentAngle =Angle::Right;d=true; break;
         }
     }
         //If a key was released
@@ -147,13 +190,16 @@ void Player::handleEvent( SDL_Event& e )
         //Adjust the velocity
         switch( e.key.keysym.sym )
         {
-
-            case SDLK_w: VelY += PLAYER_VEL;w=false; break;
-            case SDLK_s: VelY -= PLAYER_VEL;s=false; break;
-            case SDLK_a: VelX += PLAYER_VEL;a=false; break;
-            case SDLK_d: VelX -= PLAYER_VEL;d=false; break;
+          //  case SDLK_SPACE:playerVel = playerVel*2;break;
+            case SDLK_w: VelY += playerVel;w=false; break;
+            case SDLK_s: VelY -= playerVel;s=false; break;
+            case SDLK_a: VelX += playerVel;a=false; break;
+            case SDLK_d: VelX -= playerVel;d=false; break;
         }
     }
+    //set Velocities to 0 if not moving for internal consistency
+    if(!w&&!a&&!s&&!d){VelX = 0;VelY = 0;}
+
 
     //really dumb but it works
     /*

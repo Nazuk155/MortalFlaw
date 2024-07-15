@@ -13,7 +13,7 @@ class Card_Dagger : public Card {
 public:
     // Constructor
 
-      explicit Card_Dagger(u8 cID =1,
+      explicit Card_Dagger(
                          u8 dmg = 1,
                          u16 range = 400,
                          int squaredRange = 0,

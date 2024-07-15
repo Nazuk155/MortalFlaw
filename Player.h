@@ -16,7 +16,10 @@ public:
       int PLAYER_WIDTH = 32;
       int PLAYER_HEIGHT = 32;
     //Maximum axis velocity of the player
-    constexpr static const int PLAYER_VEL = 5;
+    constexpr static const int PLAYER_BASESPEED = 5;
+    int playerVel = 5;
+
+    static bool aimingMode;
     //inventory in public for ease of use
     Vector<Card*> deck;
     Vector<Card*> discard;
@@ -27,6 +30,7 @@ public:
     Card *slotRight = nullptr;
     Card *slotMiddle = nullptr;
     enum class HandPosition  {L,M,R};
+
     //Stats
     u8 health = 5;
     float drawsReady = 100;
@@ -45,8 +49,12 @@ public:
     void triggerSlot(HandPosition id);
 
     //Methods that use the Card System
-    //add card to Deck
+    //add card to Deck if not nullptr
     void addCardToDeck(Card * newCard);
+    //add card to Discard if not nullptr
+    void addCardToDiscard(Card * addedCard);
+    //put Discard back into the Deck; if shuffle is set to false it simply flips the pile into the Deck
+    void shuffleDiscardIntoDeck(bool shuffle = true);
     //triggers the castCard in Card Objects and puts the used card into the discard pile
     bool useCard(Card **selectedCard);
     //fills each hand card slot with cards from the deck while the  drawReady stat is >0

@@ -36,6 +36,7 @@ const int SCREEN_HEIGHT = 960;
 #include <string>
 #include <vector>
 #include <unordered_set>
+#include <random>
 
 #include <fmt/core.h>   // https://fmt.dev/latest/index.html
 

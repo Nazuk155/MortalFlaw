@@ -8,7 +8,7 @@
 // Override castCard method implementation
 
 
-Card_Dagger::Card_Dagger(u8 cID,
+Card_Dagger::Card_Dagger(
                          u8 dmg,
                          u16 range,
                          int squaredRange,
@@ -19,7 +19,7 @@ Card_Dagger::Card_Dagger(u8 cID,
                          Rect clip,
                          Point startingPos,
                          Point velocity)
-                         : Card(cID, dmg, range, squaredRange, uses, active, attackDirection, cardRect, clip,
+                         : Card( dmg, range, squaredRange, uses, active, attackDirection, cardRect, clip,
                                 startingPos, velocity) {
 
         this->squaredRange = this->range * this->range;
@@ -30,7 +30,7 @@ void Card_Dagger::castCard(Angle aim, Point startingPoint) {
     //set attack angle
     attackDirection = aim;
     //current position of attack
-    cardRect.x = startingPoint.x;
+    cardRect.x = startingPoint.x+cardRect.w;
     cardRect.y = startingPoint.y;
     //starting point from where it starts animating
     startingPos.x = cardRect.x;
@@ -43,39 +43,41 @@ void Card_Dagger::castCard(Angle aim, Point startingPoint) {
     // Additional implementation specific to Card_Dagger
 }
 
+///think of burning cards mechanic
+//int Card_Dagger::doWhileIgnited(const Vector<Hitbox>& hitboxList){}
 
-int Card_Dagger::doWhileActive(const Vector<Rect>& colliderList)
-{
+int Card_Dagger::doWhileActive(const Vector<Rect>& colliderList) {
     ///TODO use the hitIDSet by refactoring colliderList with enemy IDs and storing them to check if the target was already hit
     Card::hitIDSet;
+    if (active) {
+        int hit = 0;
 
-    int hit = 0;
-    //move the attack, its fine if it overlaps a  when colliding
-    move();
+        //move the attack, its fine if it overlaps a  when colliding
+        move();
 
-    Point current = {cardRect.x,cardRect.y};
-    double squaredDistanceTraveled = calculateSquaredDistance(startingPos,current);
+        Point current = {cardRect.x, cardRect.y};
+        double squaredDistanceTraveled = calculateSquaredDistance(startingPos, current);
 
-    for(Rect e:colliderList) {
-        if ((cardRect.y < 0) || (cardRect.y + cardRect.h > SCREEN_HEIGHT)){
+        for (Rect e: colliderList) {
+
+            if (SDL_HasIntersection(&cardRect,
+                                    (const SDL_Rect *) &e)) {
+
+
+                active = false;
+                return hit;
+            }
+            hit++;
+        }
+        if (squaredDistanceTraveled >= squaredRange) {
             active = false;
-            break;
+            return 999;
 
         }
-        if(SDL_HasIntersection(&cardRect,
-                            (const SDL_Rect *) &e)) {
 
-
-            active = false;
-            return hit;
-        }
-        hit ++;
+        return 999;
     }
-    if(squaredDistanceTraveled>=squaredRange)
-    {
-        active = false;
-
-    }
+    else{ printf("Card %d not active in doWhileActive for some reason?!",cID);}
 }
 
 void Card_Dagger::move()

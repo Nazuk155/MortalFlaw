@@ -15,7 +15,7 @@
 class Card {
 public:
     // Attributes
-    u8 cID;
+    int cID;
     u8 dmg;
     u16 range;
     int squaredRange = range* range;
@@ -28,10 +28,15 @@ public:
     Point velocity;
     Vector<Rect> collisionTargets;
     std::unordered_set<int> hitIDSet;
+
+    //static
+    static int nextID;
     // Constructor
     Card();
-    Card(u8 cID, u8 dmg, u16 range, int squaredRange, u8 uses, bool active, Angle attackDirection, Rect cardRect,
+    Card( u8 dmg, u16 range, int squaredRange, u8 uses, bool active, Angle attackDirection, Rect cardRect,
          Rect clip, Point startingPos, Point velocity);
+
+
 
     // Virtual destructor
     virtual ~Card() = 0;  // Pure virtual destructor
