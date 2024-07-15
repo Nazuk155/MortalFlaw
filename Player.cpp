@@ -100,7 +100,18 @@ bool Player::useCard(Card ** slot)
     return false;
 
 }
+/// TODOburn card method
+/*
+void Player::burnCard(Card** slot) {
+    if (*slot != nullptr) {
+        if (!(*slot)->active) {
+            //switch((*slot).getBurnType)
+            //case multicast: for(int i = 0; i<=(*slot).multicastAmount;i++){
 
+        }
+    }
+}
+*/
 
 void Player::drawCard()
 {

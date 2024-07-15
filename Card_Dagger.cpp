@@ -38,13 +38,12 @@ void Card_Dagger::castCard(Angle aim, Point startingPoint) {
     uses -=1;
     active = true;
 
-
 //    std::cout << "Casting Dagger Card with CID: " << CID << std::endl;
     // Additional implementation specific to Card_Dagger
 }
 
-///think of burning cards mechanic
-//int Card_Dagger::doWhileIgnited(const Vector<Hitbox>& hitboxList){}
+/// TODO think of burning cards mechanics. Include Player in the specific cards to access their deck and add cards to the temporary deck that get deleted when inactive.
+//int Card_Dagger::doWhileIgnited(const Vector<Hitbox>& hitboxList,Player &p){ p.addCardtoDeck}
 
 int Card_Dagger::doWhileActive(const Vector<Rect>& colliderList) {
     ///TODO use the hitIDSet by refactoring colliderList with enemy IDs and storing them to check if the target was already hit

@@ -8,6 +8,8 @@
 
 
 #include "Card.h"
+#include <Player.h>
+
 
 class Card_Dagger : public Card {
 public:
