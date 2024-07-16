@@ -50,6 +50,9 @@ protected:
     Texture * playerFacingTexture    = nullptr;
     Texture * cardDaggerTexture      = nullptr;
     Texture * cardSwordTexture       = nullptr;
+    Texture * uiBackgroundTexture    = nullptr;
+    Texture * uiCardBaseTexture      = nullptr;
+    Texture * uiCardWhiteSpinTexture = nullptr;
     Texture * blendedText            = nullptr;
 
 
@@ -64,6 +67,20 @@ protected:
     //standard player size is 32x32.
     ///TODO give player a clip rect
     Rect playerClipRect = {64,0,64,64};
+
+    //define UI background surface dimensions
+    Rect guiRect = {0,SCREEN_HEIGHT-SCREEN_HEIGHT/3,SCREEN_WIDTH,SCREEN_HEIGHT/3};
+
+    //store width and height of GUI card elements
+    Point uiCardSize = {128,192};
+    //clipper for the card spritesheet
+    Rect uiCardClip = {0,0,64,96};
+
+
+
+    Rect uiCardSlotLeftRect = {uiCardSize.x*3,(SCREEN_HEIGHT -uiCardSize.y)-uiCardSize.y/2,uiCardSize.x,uiCardSize.y};
+    Rect uiCardSlotMiddleRect = {(uiCardSize.x*4)+uiCardSize.x/4,(SCREEN_HEIGHT -uiCardSize.y)-uiCardSize.y/2,uiCardSize.x,uiCardSize.y};
+    Rect uiCardSlotRightRect = {(uiCardSize.x*5)+(uiCardSize.x/4)*2,(SCREEN_HEIGHT -uiCardSize.y)-uiCardSize.y/2,uiCardSize.x,uiCardSize.y};
 
     //collision table
     std::vector< Hitbox > colliderVec;
@@ -109,6 +126,8 @@ public:
 
     //helper for SDL_CreateTextureFromSurface, applys a color key r:0, g:0xFF,b:0xFF if transparent pixels are ever needed
     Texture* loadFromFile(const std::string& path);
+
+    void setUICardClipOffset(int offset){uiCardClip.x = uiCardClip.w * offset;}
 };
 
 

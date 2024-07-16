@@ -78,9 +78,11 @@ int Card_Dagger::doWhileActive(const Vector<Hitbox>& colliderList) {
         Point current = {cardRect.x, cardRect.y};
         double squaredDistanceTraveled = calculateSquaredDistance(startingPos, current);
 
+
+
         for (Hitbox e: colliderList) {
 
-
+            // i forgot to adjust the hitbox based on angle.Requires a different Rect from cardRect to not stretch the visual. Maybe polish this later
             if (SDL_HasIntersection(&cardRect,
                                     (const SDL_Rect *) &e)) {
                 //if not already hit befor

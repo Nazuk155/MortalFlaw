@@ -43,13 +43,13 @@ void Card_Sword::castCard(eFacingAngle aim, Point startingPoint) {
     switch (aim)
     {
         case eFacingAngle::Up:startingPoint.x -= cardRect.w/3;startingPoint.y -=cardRect.w/6;break;
-        case eFacingAngle::Right:startingPoint.x -=cardRect.w/6;break;
-        case eFacingAngle::Left:startingPoint.x -=cardRect.w/2;break;
-        case eFacingAngle::Down:startingPoint.x -=cardRect.w/3;startingPoint.y += cardRect.w/6;break;
-        case eFacingAngle::UpRight:startingPoint.x -=cardRect.w/6;startingPoint.y -=cardRect.w/6;break;
-        case eFacingAngle::DownLeft:startingPoint.x -=cardRect.w/2;startingPoint.y +=cardRect.w/6;break;
-        case eFacingAngle::UpLeft:startingPoint.x -=cardRect.w/2;startingPoint.y -= cardRect.w/6;break;
-        case eFacingAngle::DownRight:startingPoint.x -=cardRect.w/6;startingPoint.y += cardRect.w/6;break;
+        case eFacingAngle::Right:startingPoint.x -=cardRect.w/6;startingPoint.y -=cardRect.w/6;break;
+        case eFacingAngle::Left:startingPoint.x -=cardRect.w/3;startingPoint.y -=cardRect.w/6;break;
+        case eFacingAngle::Down:startingPoint.x -=cardRect.w/3;startingPoint.y -= cardRect.w/6;break;
+        case eFacingAngle::UpRight:startingPoint.x -=cardRect.w/6;startingPoint.y -=cardRect.w/3;break;
+        case eFacingAngle::DownLeft:startingPoint.x -=cardRect.w/3;startingPoint.y -=cardRect.w/6;break;
+        case eFacingAngle::UpLeft:startingPoint.x -=cardRect.w/3;startingPoint.y -= cardRect.w/3;break;
+        case eFacingAngle::DownRight:startingPoint.x -=cardRect.w/6;startingPoint.y -= cardRect.w/4;break;
     }
     cardRect.x = startingPoint.x;
     cardRect.y = startingPoint.y;
@@ -83,6 +83,8 @@ int Card_Sword::doWhileActive(const Vector<Hitbox>& colliderList) {
 
         Point current = {cardRect.x, cardRect.y};
         double squaredDistanceTraveled = calculateSquaredDistance(startingPos, current);
+
+
 
         for (Hitbox e: colliderList) {
 

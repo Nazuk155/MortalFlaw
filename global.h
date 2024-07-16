@@ -56,7 +56,7 @@ struct Hitbox
 {
     SDL_Rect collisionRect;
     int hitboxID;
-}
+};
 //all card names are saved here
 enum class eCardName{Dagger,Sword};
 

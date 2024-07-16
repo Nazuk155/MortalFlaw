@@ -26,7 +26,8 @@ public:
             u8 ammo = 3,
             bool active = false,
             eFacingAngle attackDirection = eFacingAngle::Up,
-            Rect cardRect ={0,0,96,36},
+            //stretched from original sprite for visual effect
+            Rect cardRect ={0,0,96,96},
             Rect clip = {0,0,64,25},
             Point startingPos = {0,0},
             Point velocity = {20,20},

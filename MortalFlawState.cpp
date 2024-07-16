@@ -6,7 +6,7 @@
 
 ///TODO cards in discard or burn that are active will be rendered until their whenActive sets active to false
 // interface on the bottom with timer filling and handcards, next card on left in small, deck next to it. Right side has player ability and discard as well as burn.
-//burned cards can be restored with forge. Player has overload charges or loses a card every 10 seconds from the top of the deck.
+//ashes cards can be restored with forge. Player has overload charges or loses a card every 10 seconds from the top of the deck.
 //to not have a constantly shifting deck the player only adds cards calmly to the deck and FORGE actions basically recovers lost ammo back into the deck.
 
 // implement the classes GameObject and Enemy, try collision and attacks
@@ -27,6 +27,9 @@ void MortalFlawState::Init()
     std::string enemyPath        =   BaseFolder "Ressources/Assets/Enemy/Enemy_Sprite_Bases.bmp";
     std::string cardDaggerPath   =   BaseFolder "/Ressources/Assets/Attacks/DAGGER/Fire_Dagger_Trimmed_Spritesheet.png";
     std::string cardSwordPath    =   BaseFolder "/Ressources/Assets/Attacks/SWORD/Player_Attack_Sword_Slash_Colors_Spritesheet.png";
+    std::string uiBackgroundPath =   BaseFolder "/Ressources/Assets/UI/UI_Background.png";
+    std::string uiCardBasePath   =   BaseFolder "Ressources/Assets/UI/UI_Card_Base_Spritesheet.png";
+    std::string uiCardWhiteSpinPath = BaseFolder "/Ressources/Assets/UI/UI_Card_White_Spin_Spritesheet.png";
 
     //----------------
 
@@ -62,7 +65,7 @@ void MortalFlawState::Init()
     for(int i= 0;i<10;i++){
        auto *temp = new Enemy();
         enemyVec.push_back(temp);
-        print("Enemy ID = %d",enemyVec.back()->getID());
+       // print("Enemy ID = %d",enemyVec.back()->getID());
     }
     enemyVec.push_back(enemyInstance);
     /*
@@ -81,11 +84,15 @@ void MortalFlawState::Init()
     playerFacingTexture  = loadFromFile(playerFacingPath);
     cardDaggerTexture    = loadFromFile(cardDaggerPath);
     cardSwordTexture     = loadFromFile(cardSwordPath);
+    uiBackgroundTexture  = loadFromFile(uiBackgroundPath);
+    uiCardBaseTexture    = loadFromFile(uiCardBasePath);
+    uiCardWhiteSpinTexture = loadFromFile(uiCardWhiteSpinPath);
 //---------------
 
 
     const Point & winSize = game.GetWindowSize();
     const Point resolution = winSize ;
+
 
     ///TODO fix this add tiles
     backgroundSurface = SDL_CreateRGBSurfaceWithFormat( 0, resolution.x, resolution.y, 32, SDL_PIXELFORMAT_RGBA32 );
@@ -100,15 +107,23 @@ void MortalFlawState::UnInit()
     SDL_DestroyTexture(playerFacingTexture);
     SDL_DestroyTexture(cardDaggerTexture);
     SDL_DestroyTexture(cardSwordTexture);
+    SDL_DestroyTexture(uiBackgroundTexture);
+    SDL_DestroyTexture(uiCardBaseTexture);
+
+
     playerFacingTexture = nullptr;
     playerTexture = nullptr;
     enemyTexture = nullptr;
     cardDaggerTexture = nullptr;
     cardSwordTexture = nullptr;
+    uiBackgroundTexture  = nullptr;
+    uiCardBaseTexture    = nullptr;
 }
 
 void MortalFlawState::Events( const u32 frame, const u32 totalMSec, const float deltaT )
 {
+    printf("Frame = %d",frame);
+    printf("currentDrawCooldown = %d\n",p->getCurrentDrawCooldown());
     SDL_PumpEvents();
 
     Event event;
@@ -121,7 +136,7 @@ void MortalFlawState::Events( const u32 frame, const u32 totalMSec, const float 
 
             //Handle input for the player
             // This is only okay because player is unique, more players would need a player controller which is not in scope of this Project
-            p->handleEvent( event );
+            p->handleEvent( event ,frame);
 
         }
 
@@ -132,6 +147,45 @@ void MortalFlawState::Update( const u32 frame, const u32 totalMSec, const float 
 
     //draw cards before handling events to update the vectors before operations happen on them
     p->drawCard();
+
+    //manage cooldown timers
+    //card use cooldown
+    if(p->getCardCooldownState())
+    {
+            p->advanceCurrentCardCooldown();
+    }
+    if(p->getcurrentCardCooldown() == 0)
+    {
+        p->setCardCooldownState(false);
+        p->resetCurrentCardCooldown();
+    }
+    // draw ressource cooldown
+    p->advanceCurrentDrawCooldown();
+    if(p->getCurrentDrawCooldown() == 0)
+    {
+        if(p->drawsReady < p->maxDrawsReady) {
+            p->drawsReady++;
+        }
+        p->resetCurrentDrawCooldown();
+    }
+    //special ability cooldown
+    if(p->abilityReady) {
+        p->advanceCurrentAbilityCooldown();
+    }
+    if(p->getCurrentAbilityCooldown() == 0)
+    {
+        p->resetCurrentAbilityCooldown();
+    }
+    //overheat punishment cooldown
+    p->advanceCurrentOverheatCooldown();
+    if(p->getCurrentOverheatCooldown() == 0)
+    {
+        if(!p->deck.empty()) {
+            p->addCardToAshes(p->deck.back());
+            p->deck.pop_back();
+            p->resetCurrentOverheatCooldow();
+        }
+    }
 
 
     //testing velocity
@@ -153,6 +207,8 @@ void MortalFlawState::Update( const u32 frame, const u32 totalMSec, const float 
 
     }
     colliderVec.push_back(enemyInstance->getHitbox());
+    Hitbox guiHelper = {guiRect,999};
+    colliderVec.push_back(guiHelper);
     ///TODO add the discard and burn for loop to iterate through the instances of that are active and start their doWhileActive
 
 
@@ -246,6 +302,34 @@ void MortalFlawState::Update( const u32 frame, const u32 totalMSec, const float 
             }
         }
     }
+    for(Card*e:p->ashes)
+    {
+        if(e != nullptr &&e->active)
+        {
+            if (activeIDs.find(e->cID) != activeIDs.end()) {
+                activeIDs.insert(e->cID);
+            }
+            int hits = e->doWhileActive(colliderVec);
+
+            if (hits <= enemyVec.size()) {
+                ///TODO do this next
+                /* card is active until all possible hits have been dealt or max rand/wall is hit
+                 * on hit the hitIDSet adds the enemy to its list so it can not be hit again
+                 * hitIDSet resets when active time of card ends
+                 * */
+
+
+                if(e->applyDebuff)
+                {
+                    enemyVec[hits]->setDebuff(1);
+                }
+
+                printf("enemy vec X pos %d", enemyVec[hits]->getRect().x);
+                enemyVec[hits]->setXPos(enemyVec[hits]->getRect().x + 100);
+                printf("enemy vec X pos %d", enemyVec[hits]->getRect().x);
+            }
+        }
+    }
 
             //printf("cID = %d",e->cID);
             //fix magic number here
@@ -257,7 +341,7 @@ void MortalFlawState::Update( const u32 frame, const u32 totalMSec, const float 
 
 
 
-    printf(" _");
+   //printf(" _");
     p->move(colliderVec);
     colliderVec.clear();
 
@@ -281,10 +365,19 @@ void MortalFlawState::Render( const u32 frame, const u32 totalMSec, const float 
        //Rect half = {0,0,winSize.x,winSize.y/2};
      //   SDL_FillRect(backgroundSurface,nullptr, SDL_MapRGBA(backgroundSurface->format,white.r,white.g,white.b,white.a));
 
+    //render the background for the UI elements
+    renderFromSpritesheet(guiRect,uiBackgroundTexture);
+    //render the card slots
+    setUICardClipOffset(0);
+    renderFromSpritesheet(uiCardSlotLeftRect,uiCardBaseTexture,&uiCardClip);
+    renderFromSpritesheet(uiCardSlotMiddleRect,uiCardBaseTexture,&uiCardClip);
+    renderFromSpritesheet(uiCardSlotRightRect,uiCardBaseTexture,&uiCardClip);
+    if(p->getCardCooldownState())
+    {
 
-
-
-
+        setUICardClipOffset(frame%4);
+        renderFromSpritesheet(uiCardSlotLeftRect,uiCardWhiteSpinTexture,&uiCardClip);
+    }
 
     ///Write Docu for these
     //render game Objects
@@ -324,6 +417,16 @@ void MortalFlawState::Render( const u32 frame, const u32 totalMSec, const float 
         }
     }
     for(Card*e:p->hand) {
+        if (e != nullptr &&e->active) {
+            switch(static_cast<int>(e->cardName))
+            {
+                case static_cast<int>(eCardName::Dagger):renderFromSpritesheet(e->cardRect,cardDaggerTexture,&e->clip,e->getAttackDirectionDouble());break;
+                case static_cast<int>(eCardName::Sword):renderFromSpritesheet(e->cardRect,cardSwordTexture,&e->clip,e->getAttackDirectionDouble());break;
+
+            }
+        }
+    }
+    for(Card*e:p->ashes) {
         if (e != nullptr &&e->active) {
             switch(static_cast<int>(e->cardName))
             {

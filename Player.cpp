@@ -5,7 +5,7 @@
 #include "Player.h"
 
 //set aimingMode toggle to off
-bool Player::aimingMode = false;
+//bool Player::aimingMode = false;
 
 Player::Player()
 {
@@ -25,6 +25,20 @@ Player::Player()
     hand.push_back(nullptr);
     hand.push_back(nullptr);
     hand.push_back(nullptr);
+
+    //set stats
+    //true if card cooldown is active
+    cardCooldownState = false;
+    //cooldowns in frames
+    cardCooldown = 30;
+
+    currentCardCooldown = 180;
+    drawCooldown = 180;
+    currentDrawCooldown = 0;
+    overheatCooldown = 600;
+    currentOverheatCooldown = 600;
+    abilityCooldown = 300;
+    currentAbilityCooldown = 0;
 
 
 }
@@ -50,38 +64,62 @@ void Player::addCardToDiscard(Card * addedCard)
         printf("ToDiscard failed due to nullptr");
     }
 }
+
+void Player::addCardToAshes(Card * addedCard)
+{
+    if(addedCard != nullptr) {
+        ashes.push_back(addedCard);
+    }
+    else
+    {
+        printf("ToBurned failed due to nullptr");
+    }
+}
+
 void Player::shuffleDiscardIntoDeck(bool shuffle)
 {
-    if(shuffle) {
-        auto rd = std::random_device{};
-        auto rng = std::default_random_engine{rd()};
-        std::shuffle(std::begin(discard), std::end(discard), rng);
-    }
-    auto size = discard.size();
-    for(auto i = 0; i<size; i++)
-    {
-        addCardToDeck(discard.back());
-        discard.pop_back();
+    if(!discard.empty()) {
+        if (shuffle) {
+            auto rd = std::random_device{};
+            auto rng = std::default_random_engine{rd()};
+            std::shuffle(std::begin(discard), std::end(discard), rng);
+        }
+        auto size = discard.size();
+        for (auto i = 0; i < size; i++) {
+            addCardToDeck(discard.back());
+            discard.pop_back();
+        }
     }
 
 }
 
-void Player::triggerSlot(HandPosition id) {
+void Player::triggerSlot(HandPosition id,u32 frame) {
+    static u32 lastTrigger = 0;
+
+
+if( frame >= lastTrigger+cardCooldown) {
 
     switch (id) {
         case HandPosition::L:
             useCard(&hand[0]);
-           // useCard(&slotLeft);
+            lastTrigger = frame;
+            cardCooldownState = true;
+            // useCard(&slotLeft);
             break;
         case HandPosition::M:
             useCard(&hand[1]);
-           // useCard(&slotMiddle);
+            lastTrigger = frame;
+            cardCooldownState = true;
+            // useCard(&slotMiddle);
             break;
         case HandPosition::R:
             useCard(&hand[2]);
-          // useCard(&slotRight);
+            lastTrigger = frame;
+            cardCooldownState = true;
+            // useCard(&slotRight);
             break;
     }
+}
 }
 
 //takes an actual card pointer so that cards that cast other cards are easy to implement later
@@ -121,16 +159,18 @@ void Player::drawCard()
     //ugly but no time to refactor
     //handsize never changes so this is fine
 
-    for(int i = 0;i<3;i++) {
-        if(deck.empty() && !discard.empty())
-        {
-            shuffleDiscardIntoDeck(false);
-        }
-        if (!deck.empty()) {
-            if (hand[i] == nullptr) {
-                drawsReady -= 1;
-                hand[i] = deck.back();
-                deck.pop_back();
+
+        for (int i = 0; i < 3; i++) {
+            if (deck.empty() && !discard.empty()) {
+                shuffleDiscardIntoDeck(false);
+            }
+            if(drawsReady > 0) {
+            if (!deck.empty()) {
+                if (hand[i] == nullptr) {
+                    drawsReady -= 1;
+                    hand[i] = deck.back();
+                    deck.pop_back();
+                }
             }
         }
     }
@@ -167,7 +207,7 @@ void Player::drawCard()
 
 }
 
-void Player::handleEvent( SDL_Event& e )
+void Player::handleEvent( SDL_Event& e,u32 frame )
 {
 
 //using enum eFacingAngle; too much time was wasted trying to get this to work.
@@ -177,6 +217,8 @@ void Player::handleEvent( SDL_Event& e )
     static bool w=false,a=false,s=false,d=false;
 
     const Uint8* currentKeyStates = SDL_GetKeyboardState(nullptr );
+
+
 
     //aimingMode standstill toggle
     if(aimingMode){ playerVel = 0;VelX = 0; VelY = 0;}else{ playerVel = 5;}
@@ -189,9 +231,9 @@ void Player::handleEvent( SDL_Event& e )
         {
             ///maybe display a aiming line on press and fire on release?
             case SDLK_SPACE:if(!aimingMode){ aimingMode = true;}else{ aimingMode = false;} break; // cant do it like this for obvious reasons. better modify the move() with an additional toggle
-            case SDLK_LEFT:triggerSlot(HandPosition::L);break;
-            case SDLK_UP:triggerSlot(HandPosition::M);break;
-            case SDLK_RIGHT:triggerSlot(HandPosition::R);break;
+            case SDLK_LEFT:triggerSlot(HandPosition::L,frame);break;
+            case SDLK_UP:triggerSlot(HandPosition::M,frame);break;
+            case SDLK_RIGHT:triggerSlot(HandPosition::R,frame);break;
             case SDLK_w: VelY -= playerVel;currentAngle =eFacingAngle::Up;w=true; break;
             case SDLK_s: VelY += playerVel;currentAngle =eFacingAngle::Down;s=true; break;
             case SDLK_a: VelX -= playerVel;currentAngle =eFacingAngle::Left;a=true;break;
@@ -316,19 +358,3 @@ void Player::move(const Vector<Hitbox>& colliderList)
 
 
 }
-double Player::getFacingAngleDouble() const {
-    return static_cast<double>(static_cast<int>(currentAngle));
-}
-eFacingAngle Player::getFacingAngle() const {return currentAngle;}
-
-
-int Player::getXPos() const{return pos.x;}
-int Player::getYPos() const{return pos.y;}
-int Player::getWidth() const{return PLAYER_WIDTH;}
-int Player::getHeight() const{return PLAYER_HEIGHT;}
-
-Rect * Player::getCollisionRect() {return &collisionRect;}
-Rect * Player::getClipRect() {return &clip;}
-
-Point * Player::getPoint()  {return &pos;}
-
