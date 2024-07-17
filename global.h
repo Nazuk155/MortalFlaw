@@ -59,6 +59,10 @@ struct Hitbox
 };
 //all card names are saved here
 enum class eCardName{Dagger,Sword};
+//no hit ID = 999
+static const int notHitID = 999;
+//deadID = -1
+static const int deadID = -1;
 
 using i8    = std::int8_t;
 using i16   = std::int16_t;

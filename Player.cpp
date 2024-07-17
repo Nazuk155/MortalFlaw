@@ -130,9 +130,8 @@ bool Player::useCard(Card ** slot)
            // Point p = {pos.x+12,pos.y};
             (*slot)->castCard(getFacingAngle(), pos);
             if((*slot)->ammo <= 0) {
-                addCardToDiscard(*slot);
                 (*slot)->ammo = (*slot)->maxUses;
-                //discard.push_back(*slot);
+                addCardToDiscard(*slot);
                 *slot = nullptr;
             }
         }
@@ -335,11 +334,15 @@ void Player::move(const Vector<Hitbox>& colliderList)
     collisionRect.x += VelX;
 
     //If the Player went too far to the left or right and check collision list
-    for(auto a:colliderList) {
-        if ((pos.x < 0) || (pos.x + PLAYER_WIDTH > SCREEN_WIDTH) || SDL_HasIntersection(&collisionRect,&a.collisionRect)) {
-            //Move back
-            pos.x -= VelX;
-            collisionRect.x -= VelX;
+
+        for (auto a: colliderList) {
+            if (a.hitboxID != deadID) {
+            if ((pos.x < 0) || (pos.x + PLAYER_WIDTH > SCREEN_WIDTH) ||
+                SDL_HasIntersection(&collisionRect, &a.collisionRect)) {
+                //Move back
+                pos.x -= VelX;
+                collisionRect.x -= VelX;
+            }
         }
     }
     //Move the Player up or down and check collider list
@@ -347,12 +350,15 @@ void Player::move(const Vector<Hitbox>& colliderList)
     collisionRect.y += VelY;
 
     //If the Player went too far up or down and check collision list
-    for(auto a:colliderList) {
-        if ((pos.y < 0) || (pos.y + PLAYER_HEIGHT > SCREEN_HEIGHT)|| SDL_HasIntersection(&collisionRect,
-                                                                                       &a.collisionRect)) {
-            //Move back
-            pos.y -= VelY;
-            collisionRect.y -= VelY;
+
+        for (auto a: colliderList) {
+            if (a.hitboxID != deadID) {
+            if ((pos.y < 0) || (pos.y + PLAYER_HEIGHT > SCREEN_HEIGHT) || SDL_HasIntersection(&collisionRect,
+                                                                                              &a.collisionRect)) {
+                //Move back
+                pos.y -= VelY;
+                collisionRect.y -= VelY;
+            }
         }
     }
 

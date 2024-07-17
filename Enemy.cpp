@@ -8,43 +8,64 @@ int Enemy::nextID = 1;
 
 Enemy::Enemy()
 {
-    EnmRect = {0,0,32,32};
+    enmRect = {0, 0, 32, 32};
     clip = {0,0,64,64};
     VelX = 0;
     VelY = 0;
     eID = nextID++;
-    eHitbox = {EnmRect,eID};
+    saveRespawnID();
+    eHitbox = {enmRect, eID};
+    originalSpawn = {enmRect.x,enmRect.y};
 
     burn = false;
 }
 
-Rect Enemy::getRect() {return EnmRect;}
-int Enemy::getID() const {return eID;}
-Hitbox Enemy::getHitbox() {return eHitbox;}
+void Enemy::respawn(int x, int y)
+{
+    enmRect.x = x;
+    enmRect.y = y;
+    eHitbox.collisionRect.x = x;
+    eHitbox.collisionRect.y = y;
+    resetHP();
+    resetID();
+    aliveOrDead = true;
+    burn = false;
+}
+void Enemy::saveRespawnID() {respawnID = eID;}
+
+void Enemy::takeDamage(int damage)
+{
+    hp -= damage;
+}
+
+void Enemy::killEnemyIfHP0()
+{
+    if(hp <= 0){ aliveOrDead = false;eID = deadID;eHitbox.hitboxID = deadID;};
+}
 
 void Enemy::move()
 {
     //Move the Player left or right
-    EnmRect.x += VelX;
+    enmRect.x += VelX;
     eHitbox.collisionRect.x += VelX;
 
     //If the Player went too far to the left or right
-    if((EnmRect.x < 0 ) || (EnmRect.x + EnmRect.w > SCREEN_WIDTH ) )
+    if((enmRect.x < 0 ) || (enmRect.x + enmRect.w > SCREEN_WIDTH ) )
     {
         //Move back
-        EnmRect.x -= VelX;
+        enmRect.x -= VelX;
         eHitbox.collisionRect.x -= VelX;
     }
 
     //Move the Player up or down
-    EnmRect.y += VelY;
+    enmRect.y += VelY;
     eHitbox.collisionRect.y += VelY;
 
     //If the Player went too far up or down
-    if((EnmRect.y < 0 ) || (EnmRect.y + EnmRect.h > SCREEN_HEIGHT ) )
+    if((enmRect.y < 0 ) || (enmRect.y + enmRect.h > SCREEN_HEIGHT ) )
     {
         //Move back
-        EnmRect.y -= VelY;
+        enmRect.y -= VelY;
         eHitbox.collisionRect.y -= VelY;
     }
 

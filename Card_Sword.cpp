@@ -88,26 +88,31 @@ int Card_Sword::doWhileActive(const Vector<Hitbox>& colliderList) {
 
         for (Hitbox e: colliderList) {
 
+            if (e.hitboxID != deadID) {
 
-            if (SDL_HasIntersection(&cardRect,
-                                    (const SDL_Rect *) &e)) {
-                //if not already hit befor
-                if (hitIDSet.find(e.hitboxID) == hitIDSet.end()) {
-                    hitIDSet.insert(e.hitboxID);
+                if (SDL_HasIntersection(&cardRect,
+                                        (const SDL_Rect *) &e)) {
+                    //if not already hit before
+                    if (hitIDSet.find(e.hitboxID) == hitIDSet.end()) {
+                        hitIDSet.insert(e.hitboxID);
 
-                    if(hitIDSet.size() == maxTargets) {
-                        active = false;
-                        hitIDSet.clear();
+                        if (hitIDSet.size() == maxTargets) {
+                            active = false;
+                            hitIDSet.clear();
+
+                            return hit;
 
 
+                        }
+
+                        return hit;
                     }
 
-                    return hit;
+
                 }
-
-
             }
-            hit ++;
+                hit++;
+
         }
         if (squaredDistanceTraveled >= squaredRange) {
             active = false;

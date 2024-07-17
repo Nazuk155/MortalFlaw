@@ -83,29 +83,32 @@ int Card_Dagger::doWhileActive(const Vector<Hitbox>& colliderList) {
         for (Hitbox e: colliderList) {
 
             // i forgot to adjust the hitbox based on angle.Requires a different Rect from cardRect to not stretch the visual. Maybe polish this later
-            if (SDL_HasIntersection(&cardRect,
-                                    (const SDL_Rect *) &e)) {
-                //if not already hit befor
-                if (hitIDSet.find(e.hitboxID) == hitIDSet.end()) {
-                    hitIDSet.insert(e.hitboxID);
+            if (e.hitboxID != deadID) {
+                if (SDL_HasIntersection(&cardRect,
+                                        (const SDL_Rect *) &e)) {
+                    //if not already hit befor
+                    if (hitIDSet.find(e.hitboxID) == hitIDSet.end()) {
+                        hitIDSet.insert(e.hitboxID);
 
-                    if(hitIDSet.size() == maxTargets) {
-                        active = false;
-                        hitIDSet.clear();
-                        state ++;
-                        if(state>=3){ applyDebuff = true;}
+                        if (hitIDSet.size() == maxTargets) {
+                            active = false;
+                            hitIDSet.clear();
+                            state++;
+                            if (state >= 3) { applyDebuff = true; }
 
+                        }
+                        state++;
+                        if (state > 3) { state = 3; }
+                        Card::setSpritesheetClip(state);
+                        if (state >= 3) { applyDebuff = true; }
+                        return hit;
                     }
-                    state ++;
-                    if(state>3){state = 3;}
-                    Card::setSpritesheetClip(state);
-                    if(state>=3){ applyDebuff = true;}
-                    return hit;
+
+
                 }
-
-
             }
-            hit ++;
+                hit++;
+
         }
         if (squaredDistanceTraveled >= squaredRange) {
             active = false;

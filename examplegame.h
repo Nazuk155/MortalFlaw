@@ -58,10 +58,16 @@ protected:
 
     Point     blendedTextSize   = { 0, 0 };
 
+
+    //-----------------------------------------------
+    ///ENEMY
     //testing single enemy
     Enemy *enemyInstance;
     //multiple enemies
     std::vector<Enemy*> enemyVec;
+    std::vector<Enemy*> enemyDeadVec;
+    std::unordered_set<int> setForHitEnemyIDs;
+    bool respawnToggle = false;
 
     Player *p;
     //standard player size is 32x32.
@@ -102,8 +108,10 @@ public:
     void Render( const u32 frame, const u32 totalMSec, const float deltaT ) override;
 
     //new functions
+    // does the logic for cards in cardVector
+    void activeCardsLogic(const Vector<Card *>& cardVector);
 
-//helper function for SDL_RenderCopyEx
+    //helper function for SDL_RenderCopyEx
     void renderFromSpritesheet(int targetX,
                                int targetY,
                                int targetW,
@@ -128,6 +136,8 @@ public:
     Texture* loadFromFile(const std::string& path);
 
     void setUICardClipOffset(int offset){uiCardClip.x = uiCardClip.w * offset;}
+
+
 };
 
 
