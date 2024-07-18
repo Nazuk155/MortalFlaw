@@ -34,7 +34,7 @@ public:
     //Stats
     u8 health = 5;
     int drawsReady = 3;
-    int maxDrawsReady = 2;
+    int maxDrawsReady = 3;
 
     //state bools
     bool aimingMode = false;
@@ -90,6 +90,13 @@ public:
     [[nodiscard]] u32 getCurrentDrawCooldown() const{return currentDrawCooldown;}
     [[nodiscard]] u32 getCurrentOverheatCooldown() const {return currentOverheatCooldown;}
     [[nodiscard]] u32 getCurrentAbilityCooldown() const {return currentAbilityCooldown;}
+    [[nodiscard]] u32 getDrawCooldown() const{return drawCooldown;}
+    [[nodiscard]] u32 getOverheatCooldown() const {return overheatCooldown;}
+    [[nodiscard]] u32 getAbilityCooldown() const {return abilityCooldown;}
+    [[nodiscard]] int getDrawCooldownPercentage() const{return currentDrawCooldown/(drawCooldown/10);}
+    [[nodiscard]] int getOverheatCooldownPercentage() const{return currentOverheatCooldown/(overheatCooldown/10);}
+    [[nodiscard]] int getAbilityCooldownPercentage() const{return currentAbilityCooldown/(abilityCooldown/10);}
+
 
     //setter Methods
     void setXPos(int newX){ collisionRect.x = newX;pos.x = newX; }
@@ -97,11 +104,13 @@ public:
     void setWidth(int newW){ PLAYER_WIDTH = newW; }
     void setHeight(int newH){ PLAYER_HEIGHT = newH;}
     void setVelocity(int newVx = 0,int newVy = 0){VelX = newVx;VelY = newVy;}
+
+
     void setCardCooldownState(bool toggle){cardCooldownState = toggle;}
 
     //special setter methods
     void advanceCurrentCardCooldown(){if(currentCardCooldown != 0){currentCardCooldown--;}}
-    void resetCurrentCardCooldown(){currentCardCooldown = cardCooldown;}
+    void resetCurrentCardCooldown(){currentCardCooldown = cardUseCooldown;}
 
     void advanceCurrentDrawCooldown(){if(currentDrawCooldown > 0){currentDrawCooldown--;}}
     void resetCurrentDrawCooldown(){currentDrawCooldown = drawCooldown;}
@@ -130,7 +139,7 @@ private:
     bool cardCooldownState;
 
     // cooldowns in frames
-    u8 cardCooldown = 30;
+    u8 cardUseCooldown = 30;
     u8 currentCardCooldown = 0;
     u32 drawCooldown = 180;
     u32 currentDrawCooldown = 180;

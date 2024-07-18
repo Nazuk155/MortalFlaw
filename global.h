@@ -56,9 +56,10 @@ struct Hitbox
 {
     SDL_Rect collisionRect;
     int hitboxID;
+    bool debuff = false;
 };
 //all card names are saved here
-enum class eCardName{Dagger,Sword};
+enum class eCardName{Dagger,Sword,ForgeStrike};
 //no hit ID = 999
 static const int notHitID = 999;
 //deadID = -1

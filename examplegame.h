@@ -14,6 +14,7 @@
 #include <Enemy.h>
 #include <Card_Dagger.h>
 #include <Card_Sword.h>
+#include <Ui_Bar.h>
 
 class ExampleGame;
 class IntroState;
@@ -53,6 +54,12 @@ protected:
     Texture * uiBackgroundTexture    = nullptr;
     Texture * uiCardBaseTexture      = nullptr;
     Texture * uiCardWhiteSpinTexture = nullptr;
+    Texture * uiBarWhiteRedTexture   = nullptr;
+    Texture * uiBarYellowBlueTexture = nullptr;
+    Texture * uiPilesTexture         = nullptr;
+    Texture * uiDrawReadyIconTexture = nullptr;
+    Texture * uiNumbersTexture       = nullptr;
+
     Texture * blendedText            = nullptr;
 
 
@@ -78,15 +85,76 @@ protected:
     Rect guiRect = {0,SCREEN_HEIGHT-SCREEN_HEIGHT/3,SCREEN_WIDTH,SCREEN_HEIGHT/3};
 
     //store width and height of GUI card elements
-    Point uiCardSize = {128,192};
+    Point uiCard_Size = {128, 192};
     //clipper for the card spritesheet
     Rect uiCardClip = {0,0,64,96};
 
 
+    Rect uiCard_SlotLeftRect = {uiCard_Size.x * 3, (SCREEN_HEIGHT - uiCard_Size.y) - uiCard_Size.y / 2, uiCard_Size.x, uiCard_Size.y};
+    Rect uiCard_SlotMiddleRect = {(uiCard_Size.x * 4) + uiCard_Size.x / 4, (SCREEN_HEIGHT - uiCard_Size.y) - uiCard_Size.y / 2, uiCard_Size.x, uiCard_Size.y};
+    Rect uiCard_SlotRightRect = {(uiCard_Size.x * 5) + (uiCard_Size.x / 4) * 2, (SCREEN_HEIGHT - uiCard_Size.y) - uiCard_Size.y / 2, uiCard_Size.x, uiCard_Size.y};
 
-    Rect uiCardSlotLeftRect = {uiCardSize.x*3,(SCREEN_HEIGHT -uiCardSize.y)-uiCardSize.y/2,uiCardSize.x,uiCardSize.y};
-    Rect uiCardSlotMiddleRect = {(uiCardSize.x*4)+uiCardSize.x/4,(SCREEN_HEIGHT -uiCardSize.y)-uiCardSize.y/2,uiCardSize.x,uiCardSize.y};
-    Rect uiCardSlotRightRect = {(uiCardSize.x*5)+(uiCardSize.x/4)*2,(SCREEN_HEIGHT -uiCardSize.y)-uiCardSize.y/2,uiCardSize.x,uiCardSize.y};
+    Point uiCard_IconSize = {uiCard_Size.x/2,uiCard_Size.y/2};
+    Rect uiCard_IconLeftRect = {uiCard_SlotLeftRect.x+(uiCard_SlotLeftRect.w/2)-uiCard_IconSize.x/2,
+                                uiCard_SlotLeftRect.y+(uiCard_SlotLeftRect.h/2)-uiCard_IconSize.y/2,
+                                uiCard_IconSize.x,
+                                uiCard_IconSize.y};
+
+    Rect uiCard_IconMiddleRect ={uiCard_SlotMiddleRect.x+(uiCard_SlotMiddleRect.w/2)-uiCard_IconSize.x/2,
+                                 uiCard_SlotMiddleRect.y+(uiCard_SlotMiddleRect.h/2)-uiCard_IconSize.y/2,
+                                uiCard_IconSize.x,
+                                uiCard_IconSize.y};
+
+    Rect uiCard_IconRightRect = {uiCard_SlotRightRect.x+(uiCard_SlotRightRect.w/2)-uiCard_IconSize.x/2,
+                                 uiCard_SlotRightRect.y+(uiCard_SlotRightRect.h/2)-uiCard_IconSize.y/2,
+                                uiCard_IconSize.x,
+                                uiCard_IconSize.y};
+
+
+
+
+
+    //card piles render size
+    Point uiPile_Size = {96, 144};
+    //clipper for uiPilesTexture
+    Rect uiPile_Clip = {0, 0, 64, 96};
+
+    Rect uiPile_DeckRect = {uiPile_Size.x, (SCREEN_HEIGHT - uiPile_Size.y) - uiPile_Size.y / 2, uiPile_Size.x, uiPile_Size.y};
+    Rect uiPile_DiscardRect = {uiPile_Size.x * 10, (SCREEN_HEIGHT - uiPile_Size.y) - uiPile_Size.y, uiPile_Size.x, uiPile_Size.y};
+    Rect uiPile_BurnRect = {uiPile_Size.x * 11 + uiPile_Size.x / 2, (SCREEN_HEIGHT - uiPile_Size.y) - uiPile_Size.y, uiPile_Size.x, uiPile_Size.y};
+
+
+    //UI BARS
+    Point uiBar_Size = {200, 20};
+    Ui_Bar uiBar_DrawBar = {uiBar_Size, 8, 14};
+    Ui_Bar uiBar_OverheatBar = {uiBar_Size, 8, 12};
+
+    //UI DRAW READY ICON
+
+    Rect uiIcon_DrawReadyClip = {0,0,16,16};
+    Rect uiIcon_1DrawReadyRect = {uiBar_DrawBar._backgroundRect.x + uiBar_DrawBar._backgroundRect.w + 16, uiBar_DrawBar._backgroundRect.y, 16, 16};
+    Rect uiIcon_2DrawReadyRect = {uiIcon_1DrawReadyRect.x + uiIcon_1DrawReadyRect.w, uiIcon_1DrawReadyRect.y, uiIcon_1DrawReadyRect.w, uiIcon_1DrawReadyRect.h};
+    Rect uiIcon_3DrawReadyRect = {uiIcon_2DrawReadyRect.x + uiIcon_2DrawReadyRect.w, uiIcon_2DrawReadyRect.y, uiIcon_2DrawReadyRect.w, uiIcon_2DrawReadyRect.h};
+
+    //UI NUMBERS
+    Point uiNumbers_Size = {64,64};
+    Rect uiNumbers_Clip = {0,0,32,32};
+
+    Rect uiNumbers_DeckCounterRect = {uiPile_DeckRect.x+uiPile_DeckRect.w/2- uiNumbers_Size.x/2,
+                                      uiPile_DeckRect.y+(uiPile_DeckRect.h/2)- uiNumbers_Size.y/8,
+                                      uiNumbers_Size.x,
+                                      uiNumbers_Size.y};
+    Rect uiNumbers_DiscardCounterRect = {uiPile_DiscardRect.x+uiPile_DiscardRect.w/2- uiNumbers_Size.x/2,
+                                         uiPile_DiscardRect.y+(uiPile_DiscardRect.h/2)- uiNumbers_Size.y/8,
+                                         uiNumbers_Size.x,
+                                         uiNumbers_Size.y};
+    Rect uiNumbers_AshesCounterRect = {uiPile_BurnRect.x+uiPile_BurnRect.w/2- uiNumbers_Size.x/2,
+                                       uiPile_BurnRect.y+(uiPile_BurnRect.h/2)- uiNumbers_Size.y/8,
+                                       uiNumbers_Size.x,
+                                       uiNumbers_Size.y};
+
+
+
 
     //collision table
     std::vector< Hitbox > colliderVec;
@@ -109,7 +177,8 @@ public:
 
     //new functions
     // does the logic for cards in cardVector
-    void activeCardsLogic(const Vector<Card *>& cardVector);
+    void activeCardsLogic(const Vector<Card *>& cardVector, u32 frame);
+    void renderActiveCardsInVector(const Vector<Card *> &cardVector);
 
     //helper function for SDL_RenderCopyEx
     void renderFromSpritesheet(int targetX,
@@ -136,6 +205,12 @@ public:
     Texture* loadFromFile(const std::string& path);
 
     void setUICardClipOffset(int offset){uiCardClip.x = uiCardClip.w * offset;}
+    void setUIPileClipOffset(int offset){ uiPile_Clip.x = uiPile_Clip.w * offset;}
+    void setUIIconDrawReadyClipOffset(int offset){uiIcon_DrawReadyClip.x = uiIcon_DrawReadyClip.w * offset;}
+    void setUINumbersClipOffset(int offset){uiNumbers_Clip.x = uiNumbers_Clip.w* offset;}
+
+
+
 
 
 };

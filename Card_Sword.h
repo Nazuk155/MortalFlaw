@@ -9,9 +9,7 @@
 // Created by max on 15.07.24.
 //
 
-#include "Card_Sword.h"
 #include "Card.h"
-#include <Player.h>
 #include <unordered_set>
 
 
@@ -39,7 +37,7 @@ public:
 
     // Override the castCard method
     void castCard(eFacingAngle aim, Point startingPoint) override;
-    int doWhileActive(const Vector<Hitbox>& colliderList) override;
+    int doWhileActive(const Vector<Hitbox> &colliderList, u32 frame, Player *player) override;
     void move() override;
     ~Card_Sword() override;
 };

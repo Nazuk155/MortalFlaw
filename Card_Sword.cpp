@@ -4,6 +4,7 @@
 
 
 #include "Card_Sword.h"
+#include "Player.h"
 
 
 // Override castCard method implementation
@@ -72,7 +73,7 @@ void Card_Sword::castCard(eFacingAngle aim, Point startingPoint) {
 /// TODO think of burning cards mechanics. Include Player in the specific cards to access their deck and add cards to the temporary deck that get deleted when inactive.
 //int Card_Dagger::doWhileIgnited(const Vector<Hitbox>& hitboxList,Player &p){ p.addCardtoDeck}
 
-int Card_Sword::doWhileActive(const Vector<Hitbox>& colliderList) {
+int Card_Sword::doWhileActive(const Vector<Hitbox> &colliderList, u32 frame, Player *player) {
 
     int hit = 0;
     int noHit = 999;
@@ -99,20 +100,14 @@ int Card_Sword::doWhileActive(const Vector<Hitbox>& colliderList) {
                         if (hitIDSet.size() == maxTargets) {
                             active = false;
                             hitIDSet.clear();
-
                             return hit;
 
-
                         }
-
                         return hit;
                     }
-
-
                 }
             }
-                hit++;
-
+            hit++;
         }
         if (squaredDistanceTraveled >= squaredRange) {
             active = false;

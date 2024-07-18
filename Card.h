@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include "global.h"
 #include "AngleHelper.h"
+#include "Player.h"
 
 #ifndef CARD_H
 #define CARD_H
@@ -70,7 +71,7 @@ public:
     //sets active = true and prepares card to be active
     virtual void castCard(eFacingAngle aim, Point startingPoint) = 0;
     //repeats until active is false. contains card logic for active card instance
-    virtual int doWhileActive(const Vector<Hitbox>& colliderList) =0;
+    virtual int doWhileActive(const Vector<Hitbox> &colliderList, u32 frame, Player *player) =0;
 
     //sets the Clip Rect x to clip the next viable portion of the spritesheet
     virtual void setSpritesheetClip(int spriteNr);

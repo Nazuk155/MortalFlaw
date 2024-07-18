@@ -66,7 +66,7 @@ void Card_Dagger::castCard(eFacingAngle aim, Point startingPoint) {
 /// TODO think of burning cards mechanics. Include Player in the specific cards to access their deck and add cards to the temporary deck that get deleted when inactive.
 //int Card_Dagger::doWhileIgnited(const Vector<Hitbox>& hitboxList,Player &p){ p.addCardtoDeck}
 
-int Card_Dagger::doWhileActive(const Vector<Hitbox>& colliderList) {
+int Card_Dagger::doWhileActive(const Vector<Hitbox> &colliderList, u32 frame, Player *player) {
 
     int hit = 0;
     int noHit = 999;
@@ -86,7 +86,7 @@ int Card_Dagger::doWhileActive(const Vector<Hitbox>& colliderList) {
             if (e.hitboxID != deadID) {
                 if (SDL_HasIntersection(&cardRect,
                                         (const SDL_Rect *) &e)) {
-                    //if not already hit befor
+                    //if not already hit before
                     if (hitIDSet.find(e.hitboxID) == hitIDSet.end()) {
                         hitIDSet.insert(e.hitboxID);
 

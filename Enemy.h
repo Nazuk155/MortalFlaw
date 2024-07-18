@@ -24,6 +24,7 @@ public:
     Hitbox getHitbox() {return eHitbox;}
     Rect * getClip(){return &clip;}
     [[nodiscard]] bool getAliveOrDead() const{return aliveOrDead;}
+    [[nodiscard]] int getHP() const{return hp;}
     [[nodiscard]] int getID() const{return eID;}
 
     //setter methods
@@ -51,7 +52,7 @@ public:
     void respawn(int x,int y);
     void saveRespawnID();
     //sets the clip offset and adjusts the clip on the spritesheet to the new one
-    void setClipOffset(int newOffset){clipOffset = newOffset; clip.x = clip.w *clipOffset;}
+    void setClipOffset(int newOffset){clipOffset = newOffset; clip.x = clip.w *newOffset;}
 private:
 
     //stats

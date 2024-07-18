@@ -30,7 +30,7 @@ Player::Player()
     //true if card cooldown is active
     cardCooldownState = false;
     //cooldowns in frames
-    cardCooldown = 30;
+    cardUseCooldown = 30;
 
     currentCardCooldown = 180;
     drawCooldown = 180;
@@ -97,26 +97,32 @@ void Player::triggerSlot(HandPosition id,u32 frame) {
     static u32 lastTrigger = 0;
 
 
-if( frame >= lastTrigger+cardCooldown) {
+if( frame >= lastTrigger + cardUseCooldown) {
 
     switch (id) {
         case HandPosition::L:
-            useCard(&hand[0]);
-            lastTrigger = frame;
-            cardCooldownState = true;
+            if(hand[0] != nullptr) {
+                useCard(&hand[0]);
+                lastTrigger = frame;
+                cardCooldownState = true;
+            }
             // useCard(&slotLeft);
             break;
         case HandPosition::M:
-            useCard(&hand[1]);
-            lastTrigger = frame;
-            cardCooldownState = true;
-            // useCard(&slotMiddle);
+            if(hand[1] != nullptr) {
+
+                useCard(&hand[1]);
+                lastTrigger = frame;
+                cardCooldownState = true;
+            }
             break;
         case HandPosition::R:
-            useCard(&hand[2]);
-            lastTrigger = frame;
-            cardCooldownState = true;
-            // useCard(&slotRight);
+            if(hand[2] != nullptr) {
+
+                useCard(&hand[2]);
+                lastTrigger = frame;
+                cardCooldownState = true;
+            }
             break;
     }
 }

@@ -41,6 +41,10 @@ add_executable(FreshMortalFlaw
         Card_Dagger.h
         Card_Sword.cpp
         Card_Sword.h
+        Ui_Bar.cpp
+        Ui_Bar.h
+        Card_ForgeStrike.cpp
+        Card_ForgeStrike.h
 
 
 )

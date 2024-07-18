@@ -35,7 +35,7 @@ public:
 
     // Override the castCard method
     void castCard(eFacingAngle aim, Point startingPoint) override;
-    int doWhileActive(const Vector<Hitbox>& colliderList) override;
+    int doWhileActive(const Vector<Hitbox> &colliderList, u32 frame, Player *player) override;
     void move() override;
     ~Card_Dagger() override;
 };
