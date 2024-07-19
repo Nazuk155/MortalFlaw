@@ -4,7 +4,7 @@
 
 
 #include "Card_Sword.h"
-#include "Player.h"
+
 
 
 // Override castCard method implementation
@@ -22,12 +22,12 @@ Card_Sword::Card_Sword(
         Point startingPos,
         Point velocity,
         int maxTargets,
-        bool applyStatus,
+        bool applyDebuff,
         u8 state,
         eCardName name,
         int maxUses)
         : Card(dmg, range, squaredRange, ammo, active, attackDirection, cardRect, clip,
-               startingPos, velocity, maxTargets, applyStatus, state, name, maxUses) {
+               startingPos, velocity, maxTargets, applyDebuff, state, name, maxUses) {
 
     this->squaredRange = this->range * this->range;
 
@@ -37,31 +37,29 @@ void Card_Sword::castCard(eFacingAngle aim, Point startingPoint) {
     //set attack angle
     attackDirection = aim;
 
-    //manually adjust where the attack starts. very hacky but not time to do it right
-    int centerX = cardRect.x + cardRect.w / 2;
-    int centerY = cardRect.y + cardRect.h / 2;
+    //set attack angle
+    attackDirection = aim;
+    //center of player sprite
+    int centerX = startingPoint.x +  32/ 2;
+    int centerY = startingPoint.y + 32/ 2;
+    //center the middle of the attack on the middle of the player sprite
+    Point centeredCardRect = {centerX -cardRect.w/2,centerY -cardRect.h/2};
 
-    switch (aim)
-    {
-        case eFacingAngle::Up:startingPoint.x -= cardRect.w/3;startingPoint.y -=cardRect.w/6;break;
-        case eFacingAngle::Right:startingPoint.x -=cardRect.w/6;startingPoint.y -=cardRect.w/6;break;
-        case eFacingAngle::Left:startingPoint.x -=cardRect.w/3;startingPoint.y -=cardRect.w/6;break;
-        case eFacingAngle::Down:startingPoint.x -=cardRect.w/3;startingPoint.y -= cardRect.w/6;break;
-        case eFacingAngle::UpRight:startingPoint.x -=cardRect.w/6;startingPoint.y -=cardRect.w/3;break;
-        case eFacingAngle::DownLeft:startingPoint.x -=cardRect.w/3;startingPoint.y -=cardRect.w/6;break;
-        case eFacingAngle::UpLeft:startingPoint.x -=cardRect.w/3;startingPoint.y -= cardRect.w/3;break;
-        case eFacingAngle::DownRight:startingPoint.x -=cardRect.w/6;startingPoint.y -= cardRect.w/4;break;
-    }
-    cardRect.x = startingPoint.x;
-    cardRect.y = startingPoint.y;
+    cardRect.x = centeredCardRect.x;
+    cardRect.y = centeredCardRect.y;
 
+
+    //starting point from where it starts animating
     startingPos.x = cardRect.x;
     startingPos.y = cardRect.y;
 
-    //we dont use state because the instances only differ in color to distinguish
-    //-1 because spritesheet clips are between 0 to 2 * clip.x
-    Card::setSpritesheetClip(ammo - 1);
-
+    //if the previous 3 strikes hit 3 targets the next one applies vulnerable and gains 2 drawTokens
+    if(state ==3)
+    {
+        applyDebuff = true;
+        state = 0;
+        Card::setSpritesheetClip(3);
+    }else{applyDebuff=false;}
 
     ammo-- ;
     active = true;
@@ -100,9 +98,23 @@ int Card_Sword::doWhileActive(const Vector<Hitbox> &colliderList, u32 frame, Pla
                         if (hitIDSet.size() == maxTargets) {
                             active = false;
                             hitIDSet.clear();
-                            return hit;
-
+                            //gain power up if 3 strikes hit 3 targets
+                            if (state < 3) {
+                                state++;
+                                Card::setSpritesheetClip(state);
+                                if(state == 3){ setSpritesheetClip(3);}
+                                return hit;
+                            }
                         }
+                        Card::setSpritesheetClip(state);
+                            if(state == 3)
+                            {
+                                Card::setSpritesheetClip(3);
+                                applyDebuff = true;
+                            }
+
+
+                        if(applyDebuff){Card::setSpritesheetClip(3);if(player->drawsReady<3){player->drawsReady += 2;}}
                         return hit;
                     }
                 }
@@ -112,8 +124,8 @@ int Card_Sword::doWhileActive(const Vector<Hitbox> &colliderList, u32 frame, Pla
         if (squaredDistanceTraveled >= squaredRange) {
             active = false;
             hitIDSet.clear();
-
-
+            state;
+            Card::setSpritesheetClip(state);
             return noHit;
 
         }

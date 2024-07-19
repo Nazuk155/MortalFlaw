@@ -33,7 +33,7 @@ Player::Player()
     cardUseCooldown = 30;
 
     currentCardCooldown = 180;
-    drawCooldown = 180;
+    drawCooldown = 360;
     currentDrawCooldown = 0;
     overheatCooldown = 600;
     currentOverheatCooldown = 600;
@@ -167,7 +167,7 @@ void Player::drawCard()
 
         for (int i = 0; i < 3; i++) {
             if (deck.empty() && !discard.empty()) {
-                shuffleDiscardIntoDeck(false);
+                shuffleDiscardIntoDeck(true);
             }
             if(drawsReady > 0) {
             if (!deck.empty()) {
@@ -221,115 +221,124 @@ void Player::handleEvent( SDL_Event& e,u32 frame )
     //If a key was pressed
     static bool w=false,a=false,s=false,d=false;
 
-    const Uint8* currentKeyStates = SDL_GetKeyboardState(nullptr );
-
-
+    //const Uint8* currentKeyStates = SDL_GetKeyboardState(nullptr );
 
     //aimingMode standstill toggle
     if(aimingMode){ playerVel = 0;VelX = 0; VelY = 0;}else{ playerVel = 5;}
-
-    if( e.type == SDL_KEYDOWN && e.key.repeat == 0 )
-    {
-       // switch( e.key.keysym.sym )
-        //Adjust the velocity
-        switch( e.key.keysym.sym )
-        {
-            ///maybe display a aiming line on press and fire on release?
-            case SDLK_SPACE:if(!aimingMode){ aimingMode = true;}else{ aimingMode = false;} break; // cant do it like this for obvious reasons. better modify the move() with an additional toggle
-            case SDLK_LEFT:triggerSlot(HandPosition::L,frame);break;
-            case SDLK_UP:triggerSlot(HandPosition::M,frame);break;
-            case SDLK_RIGHT:triggerSlot(HandPosition::R,frame);break;
-            case SDLK_w: VelY -= playerVel;currentAngle =eFacingAngle::Up;w=true; break;
-            case SDLK_s: VelY += playerVel;currentAngle =eFacingAngle::Down;s=true; break;
-            case SDLK_a: VelX -= playerVel;currentAngle =eFacingAngle::Left;a=true;break;
-            case SDLK_d: VelX += playerVel;currentAngle =eFacingAngle::Right;d=true; break;
+    //lock controls if dead
+if(deadOrAlive) {
+        if (e.type == SDL_KEYDOWN && e.key.repeat == 0) {
+            // switch( e.key.keysym.sym )
+            //Adjust the velocity
+            switch (e.key.keysym.sym) {
+                ///maybe display a aiming line on press and fire on release?
+                case SDLK_SPACE:
+                    if (!aimingMode) { aimingMode = true; }
+                    else { aimingMode = false; }
+                    break; // cant do it like this for obvious reasons. better modify the move() with an additional toggle
+                case SDLK_LEFT:
+                    triggerSlot(HandPosition::L, frame);
+                    break;
+                case SDLK_UP:
+                    triggerSlot(HandPosition::M, frame);
+                    break;
+                case SDLK_RIGHT:
+                    triggerSlot(HandPosition::R, frame);
+                    break;
+                case SDLK_w:
+                    VelY -= playerVel;
+                    currentAngle = eFacingAngle::Up;
+                    w = true;
+                    break;
+                case SDLK_s:
+                    VelY += playerVel;
+                    currentAngle = eFacingAngle::Down;
+                    s = true;
+                    break;
+                case SDLK_a:
+                    VelX -= playerVel;
+                    currentAngle = eFacingAngle::Left;
+                    a = true;
+                    break;
+                case SDLK_d:
+                    VelX += playerVel;
+                    currentAngle = eFacingAngle::Right;
+                    d = true;
+                    break;
+            }
         }
-    }
-        //If a key was released
-    else if( e.type == SDL_KEYUP && e.key.repeat == 0 )
-    {
-        //Adjust the velocity
-        switch( e.key.keysym.sym )
-        {
-          //  case SDLK_SPACE:playerVel = playerVel*2;break;
-            case SDLK_w: VelY += playerVel;w=false; break;
-            case SDLK_s: VelY -= playerVel;s=false; break;
-            case SDLK_a: VelX += playerVel;a=false; break;
-            case SDLK_d: VelX -= playerVel;d=false; break;
+            //If a key was released
+        else if (e.type == SDL_KEYUP && e.key.repeat == 0) {
+            //Adjust the velocity
+            switch (e.key.keysym.sym) {
+                //  case SDLK_SPACE:playerVel = playerVel*2;break;
+                case SDLK_w:
+                    VelY += playerVel;
+                    w = false;
+                    break;
+                case SDLK_s:
+                    VelY -= playerVel;
+                    s = false;
+                    break;
+                case SDLK_a:
+                    VelX += playerVel;
+                    a = false;
+                    break;
+                case SDLK_d:
+                    VelX -= playerVel;
+                    d = false;
+                    break;
+            }
         }
-    }
-    //set Velocities to 0 if not moving for internal consistency
-    if(!w&&!a&&!s&&!d){VelX = 0;VelY = 0;}
+        //set Velocities to 0 if not moving for internal consistency
+        if (!w && !a && !s && !d) {
+            VelX = 0;
+            VelY = 0;
+        }
 
 
-    //really dumb but it works
-    /*
-    if(w && d){ currentAngle = eFacingAngle::UpRight;}
-    if(w&&!d&&!s&&!a){currentAngle = eFacingAngle::Up;}
-    if(!w&&d&&!s&&!a){currentAngle = eFacingAngle::Right;}
+        //really dumb but it works
+        /*
+        if(w && d){ currentAngle = eFacingAngle::UpRight;}
+        if(w&&!d&&!s&&!a){currentAngle = eFacingAngle::Up;}
+        if(!w&&d&&!s&&!a){currentAngle = eFacingAngle::Right;}
 
-    if(s && d){ currentAngle = eFacingAngle::DownRight;}
-    if(s&&!d&&!a&&!w){currentAngle = eFacingAngle::Down;}
-    if(!s&&d&&!a&&!w){currentAngle = eFacingAngle::Right;}
+        if(s && d){ currentAngle = eFacingAngle::DownRight;}
+        if(s&&!d&&!a&&!w){currentAngle = eFacingAngle::Down;}
+        if(!s&&d&&!a&&!w){currentAngle = eFacingAngle::Right;}
 
-    if(w&&a){currentAngle = eFacingAngle::UpLeft;}
-    if(w&&!a&&!s&&!d){currentAngle = eFacingAngle::Up;}
-    if(!w&&a&&!s&&!d){currentAngle = eFacingAngle::Left;}
+        if(w&&a){currentAngle = eFacingAngle::UpLeft;}
+        if(w&&!a&&!s&&!d){currentAngle = eFacingAngle::Up;}
+        if(!w&&a&&!s&&!d){currentAngle = eFacingAngle::Left;}
 
-    if(s&&a){currentAngle = eFacingAngle::DownLeft;}
-    if(s&&!a&&!w&&!d){currentAngle = eFacingAngle::Down;}
-    if(!s&&a&&!w&&!d){currentAngle = eFacingAngle::Left;}
-    */
-    //made it pretty
-    if (w) {
-        if (d) {
-            currentAngle = eFacingAngle::UpRight;
+        if(s&&a){currentAngle = eFacingAngle::DownLeft;}
+        if(s&&!a&&!w&&!d){currentAngle = eFacingAngle::Down;}
+        if(!s&&a&&!w&&!d){currentAngle = eFacingAngle::Left;}
+        */
+        //made it pretty
+        if (w) {
+            if (d) {
+                currentAngle = eFacingAngle::UpRight;
+            } else if (a) {
+                currentAngle = eFacingAngle::UpLeft;
+            } else {
+                currentAngle = eFacingAngle::Up;
+            }
+        } else if (s) {
+            if (d) {
+                currentAngle = eFacingAngle::DownRight;
+            } else if (a) {
+                currentAngle = eFacingAngle::DownLeft;
+            } else {
+                currentAngle = eFacingAngle::Down;
+            }
+        } else if (d) {
+            currentAngle = eFacingAngle::Right;
         } else if (a) {
-            currentAngle = eFacingAngle::UpLeft;
-        } else {
-            currentAngle = eFacingAngle::Up;
+            currentAngle = eFacingAngle::Left;
         }
-    } else if (s) {
-        if (d) {
-            currentAngle = eFacingAngle::DownRight;
-        } else if (a) {
-            currentAngle = eFacingAngle::DownLeft;
-        } else {
-            currentAngle = eFacingAngle::Down;
-        }
-    } else if (d) {
-        currentAngle = eFacingAngle::Right;
-    } else if (a) {
-        currentAngle = eFacingAngle::Left;
     }
 
-
-    ///Diagonals are sticky when set with b But i actually kinda like it. This might become a dedicated button for vertical aim while moving now!
-    /*
-    if( currentKeyStates[ SDL_SCANCODE_W ]&&currentKeyStates[SDL_SCANCODE_D] )
-    {
-        currentAngle=eFacingAngle::UpRight;
-    }
-    if( currentKeyStates[ SDL_SCANCODE_S ]&&currentKeyStates[SDL_SCANCODE_D] )
-    {
-        currentAngle=eFacingAngle::DownRight;
-    }
-    if( currentKeyStates[ SDL_SCANCODE_W ]&&currentKeyStates[SDL_SCANCODE_A] )
-    {
-        currentAngle=eFacingAngle::UpLeft;
-    }
-    if( currentKeyStates[ SDL_SCANCODE_S ]&&currentKeyStates[SDL_SCANCODE_A] )
-    {
-        currentAngle=eFacingAngle::DownLeft;
-    }
-     */
-    //button modifier idea
-    //if(currentKeyStates[SDL_SCANCODE_E]){ }else{
-    /*
-    if(currentKeyStates[SDL_SCANCODE_LEFT]){ triggerSlot(HandPosition::L);}
-    if(currentKeyStates[SDL_SCANCODE_UP]){ triggerSlot(HandPosition::M);}
-    if(currentKeyStates[SDL_SCANCODE_RIGHT]){ triggerSlot(HandPosition::R);}
-     */
 }
 
 void Player::move(const Vector<Hitbox>& colliderList)

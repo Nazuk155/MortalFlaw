@@ -46,14 +46,14 @@ void Card_ForgeStrike::castCard(eFacingAngle aim, Point playerPos) {
 //maybe polish this logic up for each card later. Good enough for now
     switch (aim)
     {
-        case eFacingAngle::Up:cardRect.y = centeredCardRect.y + cardRect.h;break;
+        case eFacingAngle::Up:cardRect.y = centeredCardRect.y - cardRect.h;break;
         case eFacingAngle::Right:cardRect.x = centeredCardRect.x + cardRect.w;break;
         case eFacingAngle::Left:cardRect.x = centeredCardRect.x - cardRect.w;;break;
         case eFacingAngle::Down:cardRect.y = centeredCardRect.y + cardRect.h;break;
-        case eFacingAngle::UpRight:cardRect.x = centeredCardRect.x + cardRect.w;cardRect.y = centeredCardRect.y - cardRect.h;break;
-        case eFacingAngle::DownLeft:cardRect.x = centeredCardRect.x - cardRect.w;cardRect.y = centeredCardRect.y + cardRect.h;break;
-        case eFacingAngle::UpLeft:cardRect.x = centeredCardRect.x - cardRect.w;cardRect.y = centeredCardRect.y - cardRect.h;break;
-        case eFacingAngle::DownRight:cardRect.x = centeredCardRect.x + cardRect.w;cardRect.y = centeredCardRect.y + cardRect.h;;break;
+        case eFacingAngle::UpRight:cardRect.x = centeredCardRect.x + cardRect.w/2;cardRect.y = centeredCardRect.y - cardRect.h/2;break;
+        case eFacingAngle::DownLeft:cardRect.x = centeredCardRect.x - cardRect.w/2;cardRect.y = centeredCardRect.y + cardRect.h/2;break;
+        case eFacingAngle::UpLeft:cardRect.x = centeredCardRect.x - cardRect.w/2;cardRect.y = centeredCardRect.y - cardRect.h/2;break;
+        case eFacingAngle::DownRight:cardRect.x = centeredCardRect.x + cardRect.w/2;cardRect.y = centeredCardRect.y + cardRect.h/2;;break;
     }
 
     //current position of attack
@@ -61,6 +61,8 @@ void Card_ForgeStrike::castCard(eFacingAngle aim, Point playerPos) {
     //starting point from where it starts animating
     startingPos.x = cardRect.x;
     startingPos.y = cardRect.y;
+
+
     if(state == 0)
     {
         //should make new attribute to save original damage
@@ -71,6 +73,7 @@ void Card_ForgeStrike::castCard(eFacingAngle aim, Point playerPos) {
     if(state == 1)
     {
         dmg = enhancedDamage;
+        setSpritesheetClip(4);
         state = 0;
     }
 
@@ -85,46 +88,76 @@ void Card_ForgeStrike::castCard(eFacingAngle aim, Point playerPos) {
 int Card_ForgeStrike::doWhileActive(const Vector<Hitbox> &colliderList, u32 frame, Player *player) {
 
     int hit = 0;
-    const int lingeringHitboxTime = 10;
+    //start at frame2
+    static int animationTracker = 0;
+    const int lingeringHitboxTime = 30;
     static int startingFrame = 0;
     if(startingFrame == 0)
     {
         startingFrame = frame;
+
     }
 
     if (active) {
 
         if(startingFrame+ lingeringHitboxTime > frame) {
+            if(animationTracker<30&&animationTracker>24){
+                setSpritesheetClip(3);
+                if(state == 1){ setSpritesheetClip(4);}
 
-            for (Hitbox e: colliderList) {
+                for (Hitbox e: colliderList) {
 
-                if (e.hitboxID != deadID) {
-                    if (SDL_HasIntersection(&cardRect,
-                                            (const SDL_Rect *) &e)) {
-                        //if not already hit before
-                        if (hitIDSet.find(e.hitboxID) == hitIDSet.end()) {
-                            hitIDSet.insert(e.hitboxID);
+                    if (e.hitboxID != deadID) {
+                        if (SDL_HasIntersection(&cardRect,
+                                                (const SDL_Rect *) &e)) {
+                            //if not already hit before
+                            if (hitIDSet.find(e.hitboxID) == hitIDSet.end()) {
+                                hitIDSet.insert(e.hitboxID);
 
-                            if (hitIDSet.size() == maxTargets) {
-                                active = false;
-                                hitIDSet.clear();
+                                if (hitIDSet.size() == maxTargets) {
+                                    active = false;
+                                    hitIDSet.clear();
+                                    animationTracker = 0;
+                                    startingFrame = 0;
+                                }
+                                if (e.debuff) {
+                                    //if hit enemy is debuffed gain powered up next hit + reforge active
+                                    reforge(player);
+                                    state = 1;
+                                    setSpritesheetClip(4);
+                                }
+                                animationTracker++;
+                                if(animationTracker == 30){animationTracker = 0;}
+                                if(startingFrame+lingeringHitboxTime <= frame){startingFrame = 0;}
+                                return hit;
                             }
-                            if (e.debuff) {
-                                //if hit enemy is debuffed gain powered up next hit + reforge active
-                                reforge(player);
-                                state = 1;
-                            }
-                            return hit;
                         }
                     }
-                }
-                hit++;
+                    hit++;
 
+                }
             }
+            if(animationTracker<24){
+                setSpritesheetClip(2);
+            }
+            if(animationTracker<18){
+                setSpritesheetClip(2);
+            }
+            if(animationTracker<12){
+                setSpritesheetClip(1);
+            }
+            if(animationTracker<6){
+                setSpritesheetClip(0);
+            }
+
+            animationTracker++;
         }
-        if (startingFrame+ lingeringHitboxTime < frame) {
+        if (startingFrame+ lingeringHitboxTime <= frame) {
             active = false;
             hitIDSet.clear();
+            startingFrame = 0;
+            animationTracker = 0;
+            if(dmg == enhancedDamage){state = 0;}
             return notHitID;
         }
         return notHitID;
@@ -133,48 +166,20 @@ int Card_ForgeStrike::doWhileActive(const Vector<Hitbox> &colliderList, u32 fram
     return -1;
 }
 
-void Card_ForgeStrike::move()
-{
-    const double sqrt2_over_2 = std::sqrt(2) / 2;  // Precomputed value for cos(45 degrees) and sin(45 degrees)
-    // remember the y axis is inverted due to SDL
-    switch(attackDirection) {
-        case eFacingAngle::Right:
-            cardRect.x += velocity.x;
-            break;
-        case eFacingAngle::Left:
-            cardRect.x -= velocity.x;
-            break;
-        case eFacingAngle::Down:
-            cardRect.y += velocity.y;
-            break;
-        case eFacingAngle::Up:
-            cardRect.y -= velocity.y;
-            break;
-        case eFacingAngle::DownRight:
-            cardRect.x += static_cast<int>(std::round(velocity.x * sqrt2_over_2));
-            cardRect.y += static_cast<int>(std::round(velocity.y * sqrt2_over_2));
-            break;
-        case eFacingAngle::DownLeft:
-            cardRect.x -= static_cast<int>(std::round(velocity.x * sqrt2_over_2));
-            cardRect.y += static_cast<int>(std::round(velocity.y * sqrt2_over_2));
-            break;
-        case eFacingAngle::UpRight:
-            cardRect.x += static_cast<int>(std::round(velocity.x * sqrt2_over_2));
-            cardRect.y -= static_cast<int>(std::round(velocity.y * sqrt2_over_2));
-            break;
-        case eFacingAngle::UpLeft:
-            cardRect.x -= static_cast<int>(std::round(velocity.x * sqrt2_over_2));
-            cardRect.y -= static_cast<int>(std::round(velocity.y * sqrt2_over_2));
-            break;
-    }
-}
+//not needed for this card
+void Card_ForgeStrike::move(){}
 
-void Card_ForgeStrike::reforge(Player  player)
+//regains 2 cards per enemy hit into discard
+void Card_ForgeStrike::reforge(Player * player)
 {
-
+    if(!player->ashes.empty()){
     for(int i=0;i<2;i++) {
-        player.addCardToDiscard(player.ashes.back());
-        player.ashes.pop_back();
+        if(!player->ashes.empty()) {
+            player->addCardToDiscard(player->ashes.back());
+            player->ashes.pop_back();
+        }
+    }
+
 
     }
 }

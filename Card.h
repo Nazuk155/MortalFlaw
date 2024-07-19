@@ -13,7 +13,7 @@
 #ifndef CARD_H
 #define CARD_H
 
-
+class Player;
 
 class Card {
 public:
@@ -60,7 +60,7 @@ public:
     // Constructor
     Card();
     Card(u8 dmg, u16 range, int squaredRange, u8 ammo, bool active, eFacingAngle attackDirection, Rect cardRect,
-         Rect clip, Point startingPos, Point velocity, int maxTargets, bool applyStatus, u8 state,eCardName cardName,int maxUses);
+         Rect clip, Point startingPos, Point velocity, int maxTargets, bool applyDebuff, u8 state,eCardName cardName,int maxUses);
 
 
 

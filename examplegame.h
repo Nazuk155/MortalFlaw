@@ -14,6 +14,7 @@
 #include <Enemy.h>
 #include <Card_Dagger.h>
 #include <Card_Sword.h>
+#include <Card_ForgeStrike.h>
 #include <Ui_Bar.h>
 
 class ExampleGame;
@@ -51,6 +52,7 @@ protected:
     Texture * playerFacingTexture    = nullptr;
     Texture * cardDaggerTexture      = nullptr;
     Texture * cardSwordTexture       = nullptr;
+    Texture * cardForgeStrikeTexture = nullptr;
     Texture * uiBackgroundTexture    = nullptr;
     Texture * uiCardBaseTexture      = nullptr;
     Texture * uiCardWhiteSpinTexture = nullptr;
@@ -59,6 +61,7 @@ protected:
     Texture * uiPilesTexture         = nullptr;
     Texture * uiDrawReadyIconTexture = nullptr;
     Texture * uiNumbersTexture       = nullptr;
+
 
     Texture * blendedText            = nullptr;
 
@@ -78,8 +81,12 @@ protected:
 
     Player *p;
     //standard player size is 32x32.
-    ///TODO give player a clip rect
+    ///TODO give player a clip rect when taking damage is implemented
     Rect playerClipRect = {64,0,64,64};
+
+    ///UI needs to be refactored badly. All of this stuff should be composed into classes. Noticed that too late.
+    /// naming them uiSomething_ helped but this still hurts to look at
+    ///uiCard and uiPile are background objects while numbers and icons are foreground
 
     //define UI background surface dimensions
     Rect guiRect = {0,SCREEN_HEIGHT-SCREEN_HEIGHT/3,SCREEN_WIDTH,SCREEN_HEIGHT/3};
@@ -87,7 +94,7 @@ protected:
     //store width and height of GUI card elements
     Point uiCard_Size = {128, 192};
     //clipper for the card spritesheet
-    Rect uiCardClip = {0,0,64,96};
+    Rect uiCard_Clip = {0, 0, 64, 96};
 
 
     Rect uiCard_SlotLeftRect = {uiCard_Size.x * 3, (SCREEN_HEIGHT - uiCard_Size.y) - uiCard_Size.y / 2, uiCard_Size.x, uiCard_Size.y};
@@ -111,7 +118,8 @@ protected:
                                 uiCard_IconSize.y};
 
 
-
+    //for ease of use. Fix this later
+    Vector<Rect> uiCard_IconVector;
 
 
     //card piles render size
@@ -156,7 +164,8 @@ protected:
 
 
 
-    //collision table
+    //collision table + carries ID and debuff status into things as well
+    //will later hold a debuff vector for multiple types (if i ever get to that)
     std::vector< Hitbox > colliderVec;
 
 
@@ -201,18 +210,17 @@ public:
                                SDL_RendererFlip flip = SDL_FLIP_NONE,
                                bool useClipSize = false);
 
-    //helper for SDL_CreateTextureFromSurface, applys a color key r:0, g:0xFF,b:0xFF if transparent pixels are ever needed
+    //helper for SDL_CreateTextureFromSurface. Also applys a color key:(r:0, g:0xFF,b:0xFF) if transparent pixels are ever needed
     Texture* loadFromFile(const std::string& path);
 
-    void setUICardClipOffset(int offset){uiCardClip.x = uiCardClip.w * offset;}
+    //these are a good indicator for things that should be classes
+    void setUICardClipOffset(int offset){ uiCard_Clip.x = uiCard_Clip.w * offset;}
     void setUIPileClipOffset(int offset){ uiPile_Clip.x = uiPile_Clip.w * offset;}
     void setUIIconDrawReadyClipOffset(int offset){uiIcon_DrawReadyClip.x = uiIcon_DrawReadyClip.w * offset;}
     void setUINumbersClipOffset(int offset){uiNumbers_Clip.x = uiNumbers_Clip.w* offset;}
 
-
-
-
-
+    //helper to pack all cooldowns into one easy to find place
+    void manageCooldowns(u32 frame);
 };
 
 

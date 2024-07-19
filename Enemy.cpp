@@ -17,7 +17,7 @@ Enemy::Enemy()
     eHitbox = {enmRect, eID};
     originalSpawn = {enmRect.x,enmRect.y};
 
-    burn = false;
+    vulnerable = false;
 }
 
 void Enemy::respawn(int x, int y)
@@ -29,7 +29,9 @@ void Enemy::respawn(int x, int y)
     resetHP();
     resetID();
     aliveOrDead = true;
-    burn = false;
+    vulnerable = false;
+    setVulnerable(false);
+    vulnerableTimer = 0;
 }
 void Enemy::saveRespawnID() {respawnID = eID;}
 

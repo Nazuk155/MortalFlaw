@@ -8,14 +8,17 @@
 #include "AngleHelper.h"
 #include "Card.h"
 
+class Card;
+
 class Player
 {
 public:
 
-    //The dimensions of the player
-      int PLAYER_WIDTH = 32;
-      int PLAYER_HEIGHT = 32;
-    //Maximum axis velocity of the player
+    bool deadOrAlive = true;
+
+    int PLAYER_WIDTH = 32;
+    int PLAYER_HEIGHT = 32;
+    //Maximum axis velocity of the player maybe use this later
     constexpr static const int PLAYER_BASESPEED = 5;
     int playerVel = 5;
 
@@ -82,11 +85,11 @@ public:
     [[nodiscard]] int getYPos() const{return pos.y;}
     [[nodiscard]] int getWidth() const{return PLAYER_WIDTH;}
     [[nodiscard]] int getHeight() const{return PLAYER_HEIGHT;}
-    [[nodiscard]] u8 getcurrentCardCooldown() const{return currentCardCooldown;}
+    [[nodiscard]] u8 getcurrentCardUseCooldown() const{return currentCardCooldown;}
     Rect * getCollisionRect() {return &collisionRect;}
     Rect * getClipRect() {return &clip;}
     Point * getPoint()  {return &pos;}
-    [[nodiscard]] bool getCardCooldownState() const{return cardCooldownState;}
+    [[nodiscard]] bool getCardUseCooldownState() const{return cardCooldownState;}
     [[nodiscard]] u32 getCurrentDrawCooldown() const{return currentDrawCooldown;}
     [[nodiscard]] u32 getCurrentOverheatCooldown() const {return currentOverheatCooldown;}
     [[nodiscard]] u32 getCurrentAbilityCooldown() const {return currentAbilityCooldown;}
@@ -106,11 +109,11 @@ public:
     void setVelocity(int newVx = 0,int newVy = 0){VelX = newVx;VelY = newVy;}
 
 
-    void setCardCooldownState(bool toggle){cardCooldownState = toggle;}
+    void setCardUseCooldownState(bool toggle){ cardCooldownState = toggle;}
 
     //special setter methods
-    void advanceCurrentCardCooldown(){if(currentCardCooldown != 0){currentCardCooldown--;}}
-    void resetCurrentCardCooldown(){currentCardCooldown = cardUseCooldown;}
+    void advanceCurrentCardUseCooldown(){if(currentCardCooldown != 0){currentCardCooldown--;}}
+    void resetCurrentCardUseCooldown(){ currentCardCooldown = cardUseCooldown;}
 
     void advanceCurrentDrawCooldown(){if(currentDrawCooldown > 0){currentDrawCooldown--;}}
     void resetCurrentDrawCooldown(){currentDrawCooldown = drawCooldown;}

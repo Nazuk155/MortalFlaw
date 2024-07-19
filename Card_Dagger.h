@@ -27,9 +27,9 @@ public:
               Rect clip = {0,0,12,49},
               Point startingPos = {0,0},
               Point velocity = {20,20},
-              int maxTargets = 3,
+              int maxTargets = 1,
               bool applyStatus = false,
-              u8 state = 0,
+              u8 state = 1,
               eCardName name = eCardName::Dagger,
               int maxUses = 1);
 

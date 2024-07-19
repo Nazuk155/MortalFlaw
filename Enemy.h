@@ -12,7 +12,9 @@ public:
     Enemy();
 
     bool aliveOrDead = true;
-    bool burn;
+    bool vulnerable;
+    u32 vulnerableTimer = 0;
+    u16 vulnerableDuration = 300;
     u32 hitReaction = 10;
     //saves the original spawn point
     Point originalSpawn;
@@ -36,10 +38,11 @@ public:
     void setRect(int x,int y,int w,int h){ enmRect.x = x;enmRect.y = y;enmRect.w = w;enmRect.h = h;}
     void setClip(Rect newClip){clip = newClip;}
     void setVelocity(int newVx = 0,int newVy = 0){VelX = newVx;VelY = newVy;}
-    void setDebuff(int type){if(type == 1){burn = true;}}
+   // void setDebuff(int type){if(type == 1){ vulnerable = true;}}
     void setAlive(bool state){ aliveOrDead = state;}
     void setID(int newID){eID = newID; eHitbox.hitboxID = newID;}
     void setHP(int newHP){hp = newHP;}
+    void setVulnerable(bool newV){vulnerable = newV;eHitbox.debuff = newV;}
 
 
 
@@ -56,8 +59,8 @@ public:
 private:
 
     //stats
-    int hp = 3;
-    u8 hpMax = 3;
+    int hp = 6;
+    u8 hpMax = 6;
 
 
     Rect enmRect;

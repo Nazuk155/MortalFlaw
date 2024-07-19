@@ -29,32 +29,33 @@ Card_Dagger::Card_Dagger(
 }
 void Card_Dagger::castCard(eFacingAngle aim, Point startingPoint) {
 
+
     //set attack angle
     attackDirection = aim;
+    //center of player sprite
+    int centerX = startingPoint.x +  32/ 2;
+    int centerY = startingPoint.y + 32/ 2;
+    //center the middle of the attack on the middle of the player sprite
+    Point centeredCardRect = {centerX -cardRect.w/2,centerY -cardRect.h/2};
 
+    cardRect.x = centeredCardRect.x;
+    cardRect.y = centeredCardRect.y;
 
-//maybe polish this logic up for each card later. Good enough for now
-    switch (aim)
-    {
-        case eFacingAngle::Up:startingPoint.x += cardRect.w;  startingPoint.y -= cardRect.w/2;break;
-        case eFacingAngle::Right:startingPoint.x += cardRect.w;startingPoint.y -=cardRect.w/2;break;
-        case eFacingAngle::Left:startingPoint.x += cardRect.w;startingPoint.y -= cardRect.w/2;break;
-        case eFacingAngle::Down:startingPoint.x += cardRect.w;break;
-        case eFacingAngle::UpRight:startingPoint.x += cardRect.w;startingPoint.y -= cardRect.w/2;break;
-        case eFacingAngle::DownLeft:startingPoint.x += cardRect.w;startingPoint.y -= cardRect.w/2;break;
-        case eFacingAngle::UpLeft:startingPoint.x += cardRect.w;startingPoint.y -= cardRect.w/2;;break;
-        case eFacingAngle::DownRight:startingPoint.x += cardRect.w;startingPoint.y -= cardRect.w/2;break;
-    }
-
-    //current position of attack
-    cardRect.x = startingPoint.x;
-    cardRect.y = startingPoint.y;
     //starting point from where it starts animating
     startingPos.x = cardRect.x;
     startingPos.y = cardRect.y;
-    if(state>3){state = 3;}
+
+
+    //starting point from where it starts animating
+    startingPos.x = cardRect.x;
+    startingPos.y = cardRect.y;
+
     if(state>=3){ applyDebuff = true;}
+    if(state>3){state = 3;}
+    if(state == 1){applyDebuff = false;}
     Card::setSpritesheetClip(state);
+    maxTargets = state;
+    if(state == 3){state = 1;}
 
     ammo-- ;
     active = true;
@@ -63,8 +64,6 @@ void Card_Dagger::castCard(eFacingAngle aim, Point startingPoint) {
     // Additional implementation specific to Card_Dagger
 }
 
-/// TODO think of burning cards mechanics. Include Player in the specific cards to access their deck and add cards to the temporary deck that get deleted when inactive.
-//int Card_Dagger::doWhileIgnited(const Vector<Hitbox>& hitboxList,Player &p){ p.addCardtoDeck}
 
 int Card_Dagger::doWhileActive(const Vector<Hitbox> &colliderList, u32 frame, Player *player) {
 
@@ -93,14 +92,21 @@ int Card_Dagger::doWhileActive(const Vector<Hitbox> &colliderList, u32 frame, Pl
                         if (hitIDSet.size() == maxTargets) {
                             active = false;
                             hitIDSet.clear();
-                            state++;
-                            if (state >= 3) { applyDebuff = true; }
-
+                            if(!applyDebuff) {
+                                state++;
+                            }
+                            if(state >=3){state = 3;}
+                            setSpritesheetClip(state);
+                            //drawcard if max targetss hit
+                            player->drawsReady++;
+                            return hit;
                         }
-                        state++;
-                        if (state > 3) { state = 3; }
-                        Card::setSpritesheetClip(state);
-                        if (state >= 3) { applyDebuff = true; }
+                        if(!applyDebuff) {
+                            state++;
+                        }
+
+                        if(state >3){state = 3;}
+                        setSpritesheetClip(state);
                         return hit;
                     }
 
@@ -113,12 +119,12 @@ int Card_Dagger::doWhileActive(const Vector<Hitbox> &colliderList, u32 frame, Pl
         if (squaredDistanceTraveled >= squaredRange) {
             active = false;
             hitIDSet.clear();
-
-            if(state>=3){ applyDebuff = true;}
+            if(state >3){state = 3;}
+            if(state == 1&&applyDebuff){applyDebuff = false;}
+            setSpritesheetClip(state);
             return noHit;
 
         }
-        if(state>=3){ applyDebuff = true;}
         return noHit;
     }
     else{ printf("Card %d not active in doWhileActive for some reason?!",cID);}
