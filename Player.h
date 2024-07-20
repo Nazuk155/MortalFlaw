@@ -1,9 +1,7 @@
 //
 // Created by max on 01.07.24.
 //
-
-#ifndef PLAYER_H
-#define PLAYER_H
+#pragma once
 #include <global.h>
 #include "AngleHelper.h"
 #include "Card.h"
@@ -16,10 +14,11 @@ public:
 
     bool deadOrAlive = true;
 
-    int PLAYER_WIDTH = 32;
-    int PLAYER_HEIGHT = 32;
+    int playerWidth = 32;
+    int playerHeight = 32;
+
     //Maximum axis velocity of the player maybe use this later
-    constexpr static const int PLAYER_BASESPEED = 5;
+    [[maybe_unused]] constexpr static const int PLAYER_BASESPEED = 5;
     int playerVel = 5;
 
 
@@ -27,37 +26,28 @@ public:
     Vector<Card*> deck;
     Vector<Card*> discard;
     Vector<Card*> ashes;
-    //cards in hand
+
     Vector<Card*> hand;
     Card *slotLeft = nullptr;
     Card *slotRight = nullptr;
     Card *slotMiddle = nullptr;
     enum class HandPosition  {L,M,R};
 
-    //Stats
+
     u8 health = 5;
     int drawsReady = 3;
     int maxDrawsReady = 3;
-
-    //state bools
     bool aimingMode = false;
     bool abilityReady = true;
 
-
-    //Initializes the variables
     Player();
-    //Takes key presses and activates player functions like movement
+
     void handleEvent( SDL_Event& e,u32 frame );
-
-    //Moves the dot
     void move(const Vector<Hitbox>& colliderList);
-
-
-
     //triggers the card in selected hand position to be used
     void triggerSlot(HandPosition id,u32 frame);
 
-    //Methods that use the Card System
+
     //add card to Deck pile if not nullptr
     void addCardToDeck(Card * newCard);
     //add card to Discard pile if not nullptr
@@ -68,27 +58,22 @@ public:
     void shuffleDiscardIntoDeck(bool shuffle = true);
     //triggers the castCard in Card Objects and puts the used card into the discard pile
     bool useCard(Card **selectedCard);
-    //fills each hand card slot with cards from the deck while the  drawReady stat is >0
+    //fills each hand card slot with cards from the deck while the  drawReady stat is >0. Additionally removes cards with 0 ammo left.
     void drawCard();
 
-    //getter Methods
     //returns angle in 45 degree steps for rendering rotated sprites based on currentAngle
-
-
-
-    //getter methods
     [[nodiscard]] double getFacingAngleDouble() const {
         return static_cast<double>(static_cast<int>(currentAngle));
     }
     [[nodiscard]] eFacingAngle getFacingAngle() const {return currentAngle;}
     [[nodiscard]] int getXPos() const{return pos.x;}
     [[nodiscard]] int getYPos() const{return pos.y;}
-    [[nodiscard]] int getWidth() const{return PLAYER_WIDTH;}
-    [[nodiscard]] int getHeight() const{return PLAYER_HEIGHT;}
+    [[nodiscard]] int getWidth() const{return playerWidth;}
+    [[nodiscard]] int getHeight() const{return playerHeight;}
     [[nodiscard]] u8 getcurrentCardUseCooldown() const{return currentCardCooldown;}
-    Rect * getCollisionRect() {return &collisionRect;}
-    Rect * getClipRect() {return &clip;}
-    Point * getPoint()  {return &pos;}
+    [[nodiscard]] Rect * getCollisionRect() {return &collisionRect;}
+    [[nodiscard]] Rect * getClipRect() {return &clip;}
+    [[nodiscard]] Point * getPoint()  {return &pos;}
     [[nodiscard]] bool getCardUseCooldownState() const{return cardCooldownState;}
     [[nodiscard]] u32 getCurrentDrawCooldown() const{return currentDrawCooldown;}
     [[nodiscard]] u32 getCurrentOverheatCooldown() const {return currentOverheatCooldown;}
@@ -96,49 +81,41 @@ public:
     [[nodiscard]] u32 getDrawCooldown() const{return drawCooldown;}
     [[nodiscard]] u32 getOverheatCooldown() const {return overheatCooldown;}
     [[nodiscard]] u32 getAbilityCooldown() const {return abilityCooldown;}
-    [[nodiscard]] int getDrawCooldownPercentage() const{return currentDrawCooldown/(drawCooldown/10);}
-    [[nodiscard]] int getOverheatCooldownPercentage() const{return currentOverheatCooldown/(overheatCooldown/10);}
-    [[nodiscard]] int getAbilityCooldownPercentage() const{return currentAbilityCooldown/(abilityCooldown/10);}
+    [[nodiscard]] u32 getDrawCooldownPercentage() const{return currentDrawCooldown/(drawCooldown/10);}
+    [[nodiscard]] u32 getOverheatCooldownPercentage() const{return currentOverheatCooldown/(overheatCooldown/10);}
+
+    //currently unused as special ability is not in scope for now
+    [[maybe_unused]] [[nodiscard]] u32 getAbilityCooldownPercentage() const{return currentAbilityCooldown/(abilityCooldown/10);}
 
 
-    //setter Methods
-    void setXPos(int newX){ collisionRect.x = newX;pos.x = newX; }
-    void setYPos(int newY){ collisionRect.y=newY;pos.y = newY; }
-    void setWidth(int newW){ PLAYER_WIDTH = newW; }
-    void setHeight(int newH){ PLAYER_HEIGHT = newH;}
-    void setVelocity(int newVx = 0,int newVy = 0){VelX = newVx;VelY = newVy;}
+    void setXPos(int newX)noexcept{ collisionRect.x = newX;pos.x = newX; }
+    void setYPos(int newY)noexcept{ collisionRect.y=newY;pos.y = newY; }
+    void setWidth(int newW)noexcept{ playerWidth = newW; }
+    void setHeight(int newH)noexcept{ playerHeight = newH;}
+    void setVelocity(int newVx = 0,int newVy = 0)noexcept{VelX = newVx;VelY = newVy;}
 
 
     void setCardUseCooldownState(bool toggle){ cardCooldownState = toggle;}
 
-    //special setter methods
-    void advanceCurrentCardUseCooldown(){if(currentCardCooldown != 0){currentCardCooldown--;}}
-    void resetCurrentCardUseCooldown(){ currentCardCooldown = cardUseCooldown;}
+    void advanceCurrentCardUseCooldown()noexcept{if(currentCardCooldown != 0){currentCardCooldown--;}}
+    void resetCurrentCardUseCooldown()noexcept{ currentCardCooldown = cardUseCooldown;}
 
-    void advanceCurrentDrawCooldown(){if(currentDrawCooldown > 0){currentDrawCooldown--;}}
-    void resetCurrentDrawCooldown(){currentDrawCooldown = drawCooldown;}
+    void advanceCurrentDrawCooldown()noexcept{if(currentDrawCooldown > 0){currentDrawCooldown--;}}
+    void resetCurrentDrawCooldown()noexcept{currentDrawCooldown = drawCooldown;}
 
-    void advanceCurrentOverheatCooldown(){if(currentOverheatCooldown > 0){currentOverheatCooldown--;}}
-    void resetCurrentOverheatCooldow(){currentOverheatCooldown = overheatCooldown;}
+    void advanceCurrentOverheatCooldown()noexcept{if(currentOverheatCooldown > 0){currentOverheatCooldown--;}}
+    void resetCurrentOverheatCooldow()noexcept{currentOverheatCooldown = overheatCooldown;}
 
-    void advanceCurrentAbilityCooldown(){if(currentAbilityCooldown > 0){currentAbilityCooldown--;}}
-    void resetCurrentAbilityCooldown(){currentAbilityCooldown = abilityCooldown;}
+    void advanceCurrentAbilityCooldown()noexcept{if(currentAbilityCooldown > 0){currentAbilityCooldown--;}}
+    void resetCurrentAbilityCooldown()noexcept{currentAbilityCooldown = abilityCooldown;}
 
 
 private:
-    //The X and Y offsets of the player
-
     Point pos;
-    //The velocity of the player
     int VelX, VelY;
-
-    //Collision Box
     Rect collisionRect;
-    //Spritesheet clipper box
     Rect clip;
-    // enum of facing direction of player
     eFacingAngle currentAngle;
-
     bool cardCooldownState;
 
     // cooldowns in frames
@@ -154,8 +131,3 @@ private:
 
 
 };
-
-
-
-
-#endif //PLAYER_H

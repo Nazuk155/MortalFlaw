@@ -2,8 +2,6 @@
 // Created by max on 01.07.24.
 //
 
-#ifndef RECTHELPER_H
-#define RECTHELPER_H
 #pragma once
 
 #include <global.h>
@@ -82,4 +80,3 @@ constexpr SDL_FRect    operator*  (const SDL_FRect lhs, const float rhs) { retur
 constexpr SDL_FRect    operator/  (const SDL_FRect lhs, const float rhs) { return { lhs.x, lhs.y, lhs.w / rhs, lhs.h / rhs }; }
 constexpr SDL_FRect&   operator*= (SDL_FRect& lhs, const float rhs) { lhs = lhs * rhs; return lhs; }
 constexpr SDL_FRect&   operator/= (SDL_FRect& lhs, const float rhs) { lhs = lhs / rhs; return lhs; }
-#endif //RECTHELPER_H

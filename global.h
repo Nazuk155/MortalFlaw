@@ -59,11 +59,16 @@ struct Hitbox
     bool debuff = false;
 };
 //all card names are saved here
-enum class eCardName{Dagger,Sword,ForgeStrike};
+enum class eCardName {
+        BaseCard,Dagger, Sword, ForgeStrike
+};
+
 //no hit ID = 999
-static const int notHitID = 999;
+static constexpr int notHitID = 999;
 //deadID = -1
-static const int deadID = -1;
+static constexpr int deadID = -1;
+// Precomputed value for cos(45 degrees) and sin(45 degrees)
+constexpr double sqrt2_over_2 = 0.7071067811865476;
 
 using i8    = std::int8_t;
 using i16   = std::int16_t;

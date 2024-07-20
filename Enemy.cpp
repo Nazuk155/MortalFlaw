@@ -20,7 +20,7 @@ Enemy::Enemy()
     vulnerable = false;
 }
 
-void Enemy::respawn(int x, int y)
+void Enemy::respawn(int x, int y) noexcept
 {
     enmRect.x = x;
     enmRect.y = y;
@@ -33,40 +33,34 @@ void Enemy::respawn(int x, int y)
     setVulnerable(false);
     vulnerableTimer = 0;
 }
-void Enemy::saveRespawnID() {respawnID = eID;}
+void Enemy::saveRespawnID() noexcept {respawnID = eID;}
 
-void Enemy::takeDamage(int damage)
+void Enemy::takeDamage(int damage) noexcept
 {
     hp -= damage;
 }
 
-void Enemy::killEnemyIfHP0()
+void Enemy::killEnemyIfHP0()noexcept
 {
     if(hp <= 0){ aliveOrDead = false;eID = deadID;eHitbox.hitboxID = deadID;};
 }
 
-void Enemy::move()
+void Enemy::move() noexcept
 {
-    //Move the Player left or right
     enmRect.x += VelX;
     eHitbox.collisionRect.x += VelX;
 
-    //If the Player went too far to the left or right
     if((enmRect.x < 0 ) || (enmRect.x + enmRect.w > SCREEN_WIDTH ) )
     {
-        //Move back
         enmRect.x -= VelX;
         eHitbox.collisionRect.x -= VelX;
     }
 
-    //Move the Player up or down
     enmRect.y += VelY;
     eHitbox.collisionRect.y += VelY;
 
-    //If the Player went too far up or down
     if((enmRect.y < 0 ) || (enmRect.y + enmRect.h > SCREEN_HEIGHT ) )
     {
-        //Move back
         enmRect.y -= VelY;
         eHitbox.collisionRect.y -= VelY;
     }

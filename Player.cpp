@@ -9,25 +9,21 @@
 
 Player::Player()
 {
-    ///needs inventory/deck, current hand pointers, facing direction,stats like hp etc.,
 
-    //Initialize the offsets
     pos.x = 0;
     pos.y = 0;
 
-    //Initialize the velocity
     VelX = 0;
     VelY = 0;
 
-    collisionRect  = {pos.x,pos.y,PLAYER_WIDTH,PLAYER_HEIGHT};
+    collisionRect  = {pos.x, pos.y, playerWidth, playerHeight};
 
     //initialize hand with 3 slots
     hand.push_back(nullptr);
     hand.push_back(nullptr);
     hand.push_back(nullptr);
+    //I should limit the Vector to a max size of 3. Refactor later
 
-    //set stats
-    //true if card cooldown is active
     cardCooldownState = false;
     //cooldowns in frames
     cardUseCooldown = 30;
@@ -129,11 +125,13 @@ if( frame >= lastTrigger + cardUseCooldown) {
 }
 
 //takes an actual card pointer so that cards that cast other cards are easy to implement later
+//also returns a bool in case i wanna do something when the player tries to use empty slots
 bool Player::useCard(Card ** slot)
 {
+
+
     if(*slot != nullptr) {
         if(!(*slot)->active) {
-           // Point p = {pos.x+12,pos.y};
             (*slot)->castCard(getFacingAngle(), pos);
             if((*slot)->ammo <= 0) {
                 (*slot)->ammo = (*slot)->maxUses;
@@ -146,7 +144,7 @@ bool Player::useCard(Card ** slot)
     return false;
 
 }
-/// TODOburn card method
+/// burn card method idea. Not ins scope for now
 /*
 void Player::burnCard(Card** slot) {
     if (*slot != nullptr) {
@@ -161,16 +159,23 @@ void Player::burnCard(Card** slot) {
 
 void Player::drawCard()
 {
-    //ugly but no time to refactor
     //handsize never changes so this is fine
-
-
         for (int i = 0; i < 3; i++) {
             if (deck.empty() && !discard.empty()) {
                 shuffleDiscardIntoDeck(true);
             }
             if(drawsReady > 0) {
             if (!deck.empty()) {
+                //additional logic to handle cards like Sword that have changing amount of uses
+                if(hand[i] != nullptr) {
+                    if (hand[i]->ammo <= 0) {
+                        if (hand[i]->ammo <= 0) {
+                            hand[i]->ammo = hand[i]->maxUses;
+                            addCardToDiscard(hand[i]);
+                            hand[i] = nullptr;
+                        }
+                    }
+                }
                 if (hand[i] == nullptr) {
                     drawsReady -= 1;
                     hand[i] = deck.back();
@@ -179,59 +184,25 @@ void Player::drawCard()
             }
         }
     }
-
-    /*
-    if(slotLeft == nullptr)
-    {
-        if(drawsReady>0 && !deck.empty())
-        {
-            drawsReady -=1;
-            slotLeft = deck.back();
-            deck.pop_back();
-        }
-    }
-    if(slotMiddle == nullptr)
-    {
-        if(drawsReady>0&& !deck.empty())
-        {
-            drawsReady -=1;
-            slotMiddle = deck.back();
-            deck.pop_back();
-        }
-    }
-    if(slotRight == nullptr)
-    {
-        if(drawsReady>0&& !deck.empty())
-        {
-            drawsReady -=1;
-            slotRight = deck.back();
-            deck.pop_back();
-        }
-    }
-*/
-
 }
 
 void Player::handleEvent( SDL_Event& e,u32 frame )
 {
 
-//using enum eFacingAngle; too much time was wasted trying to get this to work.
+//using enum eFacingAngle;
+//too much time was wasted trying to get this to work.
 //can not get this enum namespace to work in any way. I tried updating compilers and more. Alas my directions come with eFacingAngle:: for now
 
-    //If a key was pressed
     static bool w=false,a=false,s=false,d=false;
 
-    //const Uint8* currentKeyStates = SDL_GetKeyboardState(nullptr );
 
     //aimingMode standstill toggle
     if(aimingMode){ playerVel = 0;VelX = 0; VelY = 0;}else{ playerVel = 5;}
+
     //lock controls if dead
 if(deadOrAlive) {
         if (e.type == SDL_KEYDOWN && e.key.repeat == 0) {
-            // switch( e.key.keysym.sym )
-            //Adjust the velocity
             switch (e.key.keysym.sym) {
-                ///maybe display a aiming line on press and fire on release?
                 case SDLK_SPACE:
                     if (!aimingMode) { aimingMode = true; }
                     else { aimingMode = false; }
@@ -267,7 +238,6 @@ if(deadOrAlive) {
                     break;
             }
         }
-            //If a key was released
         else if (e.type == SDL_KEYUP && e.key.repeat == 0) {
             //Adjust the velocity
             switch (e.key.keysym.sym) {
@@ -296,26 +266,6 @@ if(deadOrAlive) {
             VelY = 0;
         }
 
-
-        //really dumb but it works
-        /*
-        if(w && d){ currentAngle = eFacingAngle::UpRight;}
-        if(w&&!d&&!s&&!a){currentAngle = eFacingAngle::Up;}
-        if(!w&&d&&!s&&!a){currentAngle = eFacingAngle::Right;}
-
-        if(s && d){ currentAngle = eFacingAngle::DownRight;}
-        if(s&&!d&&!a&&!w){currentAngle = eFacingAngle::Down;}
-        if(!s&&d&&!a&&!w){currentAngle = eFacingAngle::Right;}
-
-        if(w&&a){currentAngle = eFacingAngle::UpLeft;}
-        if(w&&!a&&!s&&!d){currentAngle = eFacingAngle::Up;}
-        if(!w&&a&&!s&&!d){currentAngle = eFacingAngle::Left;}
-
-        if(s&&a){currentAngle = eFacingAngle::DownLeft;}
-        if(s&&!a&&!w&&!d){currentAngle = eFacingAngle::Down;}
-        if(!s&&a&&!w&&!d){currentAngle = eFacingAngle::Left;}
-        */
-        //made it pretty
         if (w) {
             if (d) {
                 currentAngle = eFacingAngle::UpRight;
@@ -343,16 +293,17 @@ if(deadOrAlive) {
 
 void Player::move(const Vector<Hitbox>& colliderList)
 {
-    //Move the Player left or right
-
     pos.x +=VelX;
     collisionRect.x += VelX;
 
-    //If the Player went too far to the left or right and check collision list
+    //reset player if they get pushed out of screen bounds for some reason
+    if(pos.x > SCREEN_WIDTH||pos.x< 0){ pos.x = SCREEN_WIDTH/2;}
+    if(pos.y > SCREEN_HEIGHT||pos.y< 0){ pos.y = SCREEN_HEIGHT/2;}
+
 
         for (auto a: colliderList) {
             if (a.hitboxID != deadID) {
-            if ((pos.x < 0) || (pos.x + PLAYER_WIDTH > SCREEN_WIDTH) ||
+            if ((pos.x < 0) || (pos.x + playerWidth > SCREEN_WIDTH) ||
                 SDL_HasIntersection(&collisionRect, &a.collisionRect)) {
                 //Move back
                 pos.x -= VelX;
@@ -360,22 +311,17 @@ void Player::move(const Vector<Hitbox>& colliderList)
             }
         }
     }
-    //Move the Player up or down and check collider list
     pos.y += VelY;
     collisionRect.y += VelY;
 
-    //If the Player went too far up or down and check collision list
-
         for (auto a: colliderList) {
             if (a.hitboxID != deadID) {
-            if ((pos.y < 0) || (pos.y + PLAYER_HEIGHT > SCREEN_HEIGHT) || SDL_HasIntersection(&collisionRect,
-                                                                                              &a.collisionRect)) {
+            if ((pos.y < 0) || (pos.y + playerHeight > SCREEN_HEIGHT) || SDL_HasIntersection(&collisionRect,
+                                                                                             &a.collisionRect)) {
                 //Move back
                 pos.y -= VelY;
                 collisionRect.y -= VelY;
             }
         }
     }
-
-
 }

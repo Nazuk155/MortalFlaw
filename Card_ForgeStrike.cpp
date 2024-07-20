@@ -5,45 +5,56 @@
 #include "Card_ForgeStrike.h"
 
 
+/** DESCRIPTION:
+ * Forge cards are essential for the game to function. They restore cards back into the discard based on conditions being fulfilled.
+ *
+ * ForgeStrike interacts with the vulnerable debuff.
+ * If used normally it deals 3 damage after a delayed animation.
+ * If used on debuffed enemies it triggers reforge() and adds cards back into the deck based on the amount of debuffed enemies hit.
+ * It also gains double damage and a enhanced state.
+ * Enhanced hits on debuffed enemies restore double the normal amount of cards.
+ *
+ * The attack has a delayed hitbox as it represents a big slow hammer strike that erupts the ground.
+ * It is only active from frame 26-30.
+ * */
+
 
 Card_ForgeStrike::Card_ForgeStrike(
         u8 dmg,
-        u16 range,
-        int squaredRange,
-        u8 ammo,
-        bool active,
-        eFacingAngle attackDirection,
         Rect cardRect,
         Rect clip,
-        Point startingPos,
-        Point velocity,
         int maxTargets,
-        bool applyStatus,
-        u8 state,
-        eCardName name,
-        int maxUses,
-        int conditionalDamage)
-        : Card(dmg, range, squaredRange, ammo, active, attackDirection, cardRect, clip,
-               startingPos, velocity, maxTargets, applyStatus, state, name, maxUses),
-          enhancedDamage(conditionalDamage){
+        int enhancedDamage)
 
-    this->squaredRange = this->range * this->range;
+        : Card(dmg,
+               0,
+               0,
+               1,
+               false,
+               eFacingAngle::Up,
+               cardRect,
+               clip,
+               {0,0},
+               {0,0},
+               maxTargets,
+               false,
+               clipOffset,
+               eCardName::ForgeStrike,
+               1,
+               eChargeLevels::LVL0),
+          enhancedDamage(enhancedDamage){}
 
-}
 void Card_ForgeStrike::castCard(eFacingAngle aim, Point playerPos) {
 
-    //set attack angle
     attackDirection = aim;
     //center of player sprite
     int centerX = playerPos.x +  32/ 2;
     int centerY = playerPos.y + 32/ 2;
     //center the middle of the attack on the middle of the player sprite
     Point centeredCardRect = {centerX -cardRect.w/2,centerY -cardRect.h/2};
-
     cardRect.x = centeredCardRect.x;
     cardRect.y = centeredCardRect.y;
 
-//maybe polish this logic up for each card later. Good enough for now
     switch (aim)
     {
         case eFacingAngle::Up:cardRect.y = centeredCardRect.y - cardRect.h;break;
@@ -56,30 +67,26 @@ void Card_ForgeStrike::castCard(eFacingAngle aim, Point playerPos) {
         case eFacingAngle::DownRight:cardRect.x = centeredCardRect.x + cardRect.w/2;cardRect.y = centeredCardRect.y + cardRect.h/2;;break;
     }
 
-    //current position of attack
-
-    //starting point from where it starts animating
     startingPos.x = cardRect.x;
     startingPos.y = cardRect.y;
 
 
-    if(state == 0)
+    if(currentChargeLevel == eChargeLevels::LVL0)
     {
         //should make new attribute to save original damage
         dmg = 1;
     }
 
-    //if debuffed enemy was hit use enhanced damage
-    if(state == 1)
+    //if debuffed enemy was hit use enhanced damage on next use
+    if(currentChargeLevel == eChargeLevels::FULL)
     {
         dmg = enhancedDamage;
         setSpritesheetClip(4);
-        state = 0;
+        currentChargeLevel = eChargeLevels::LVL0 ;
     }
 
     ammo-- ;
     active = true;
-
 }
 
 /// TODO think of burning cards mechanics. Include Player in the specific cards to access their deck and add cards to the temporary deck that get deleted when inactive.
@@ -88,22 +95,14 @@ void Card_ForgeStrike::castCard(eFacingAngle aim, Point playerPos) {
 int Card_ForgeStrike::doWhileActive(const Vector<Hitbox> &colliderList, u32 frame, Player *player) {
 
     int hit = 0;
-    //start at frame2
-    static int animationTracker = 0;
-    const int lingeringHitboxTime = 30;
-    static int startingFrame = 0;
-    if(startingFrame == 0)
-    {
-        startingFrame = frame;
-
-    }
+    static int animationFrame = 0;
+    const int animationDuration = 30;
 
     if (active) {
-
-        if(startingFrame+ lingeringHitboxTime > frame) {
-            if(animationTracker<30&&animationTracker>24){
+        if(animationFrame <= animationDuration) {
+            if(animationFrame < 30 && animationFrame > 24){
                 setSpritesheetClip(3);
-                if(state == 1){ setSpritesheetClip(4);}
+                if(dmg == enhancedDamage){ setSpritesheetClip(4);}
 
                 for (Hitbox e: colliderList) {
 
@@ -117,18 +116,15 @@ int Card_ForgeStrike::doWhileActive(const Vector<Hitbox> &colliderList, u32 fram
                                 if (hitIDSet.size() == maxTargets) {
                                     active = false;
                                     hitIDSet.clear();
-                                    animationTracker = 0;
-                                    startingFrame = 0;
+                                    animationFrame = 0;
                                 }
                                 if (e.debuff) {
                                     //if hit enemy is debuffed gain powered up next hit + reforge active
                                     reforge(player);
-                                    state = 1;
-                                    setSpritesheetClip(4);
+                                    currentChargeLevel = eChargeLevels::FULL;
                                 }
-                                animationTracker++;
-                                if(animationTracker == 30){animationTracker = 0;}
-                                if(startingFrame+lingeringHitboxTime <= frame){startingFrame = 0;}
+                                animationFrame++;
+                                if(animationFrame == 30){ animationFrame = 0;}
                                 return hit;
                             }
                         }
@@ -137,27 +133,30 @@ int Card_ForgeStrike::doWhileActive(const Vector<Hitbox> &colliderList, u32 fram
 
                 }
             }
-            if(animationTracker<24){
+            if(animationFrame < 24){
                 setSpritesheetClip(2);
             }
-            if(animationTracker<18){
+            if(animationFrame < 18){
                 setSpritesheetClip(2);
             }
-            if(animationTracker<12){
+            if(animationFrame < 12){
                 setSpritesheetClip(1);
             }
-            if(animationTracker<6){
+            if(animationFrame < 6){
                 setSpritesheetClip(0);
             }
 
-            animationTracker++;
+            animationFrame++;
         }
-        if (startingFrame+ lingeringHitboxTime <= frame) {
+        if (animationFrame >= animationDuration) {
             active = false;
             hitIDSet.clear();
-            startingFrame = 0;
-            animationTracker = 0;
-            if(dmg == enhancedDamage){state = 0;}
+            animationFrame = 0;
+
+            //if the enhanced strike was used set the it back to uncharged unless debuffed enemy hit with it
+            if(dmg == enhancedDamage){currentChargeLevel = eChargeLevels::LVL0;}
+            //if a debuffed enemy was hit change to clip 4 to show powered up attack in hand icon
+            if(currentChargeLevel == eChargeLevels::FULL){ setSpritesheetClip(4);}
             return notHitID;
         }
         return notHitID;
@@ -167,21 +166,24 @@ int Card_ForgeStrike::doWhileActive(const Vector<Hitbox> &colliderList, u32 fram
 }
 
 //not needed for this card
-void Card_ForgeStrike::move(){}
+void Card_ForgeStrike::move()noexcept{}
 
-//regains 2 cards per enemy hit into discard
+//regains cards based on enemy hit. More if the strike is powered up
 void Card_ForgeStrike::reforge(Player * player)
 {
-    if(!player->ashes.empty()){
-    for(int i=0;i<2;i++) {
+    int amountOfCardsRestored = 1;
+    if(dmg == enhancedDamage){
+        amountOfCardsRestored = 2;
+    }
         if(!player->ashes.empty()) {
-            player->addCardToDiscard(player->ashes.back());
-            player->ashes.pop_back();
+            for (int i = 0; i < amountOfCardsRestored; i++) {
+                if (!player->ashes.empty()) {
+                    player->addCardToDiscard(player->ashes.back());
+                    player->ashes.pop_back();
+                }
+            }
         }
-    }
 
-
-    }
 }
 
 Card_ForgeStrike::~Card_ForgeStrike()= default;

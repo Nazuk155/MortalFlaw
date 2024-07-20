@@ -1,5 +1,4 @@
-#ifndef ANGLE_HELPER_H
-#define ANGLE_HELPER_H
+#pragma once
 #include <global.h>
 
 enum class eFacingAngle {
@@ -17,5 +16,3 @@ eFacingAngle operator+(eFacingAngle a1, eFacingAngle a2);
 eFacingAngle& operator+=(eFacingAngle& a1, eFacingAngle a2);
 eFacingAngle operator-(eFacingAngle a1, eFacingAngle a2);
 eFacingAngle& operator-=(eFacingAngle& a1, eFacingAngle a2);
-
-#endif // ANGLE_HELPER_H

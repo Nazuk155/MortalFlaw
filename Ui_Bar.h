@@ -1,12 +1,11 @@
 //
 // Created by max on 18.07.24.
 //
+#pragma once
 
-#ifndef FRESHMORTALFLAW_UI_BAR_H
-#define FRESHMORTALFLAW_UI_BAR_H
 #include "global.h"
 
-
+/** UI is a mess. Still need to clean this class up as well. Does what i need it to do right now and not more.*/
 class Ui_Bar {
 
 public:
@@ -27,6 +26,3 @@ public:
 
     void setUIBarDrawFillerPercent(int percent);
 };
-
-
-#endif //FRESHMORTALFLAW_UI_BAR_H

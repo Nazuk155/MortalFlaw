@@ -62,31 +62,27 @@ protected:
     Texture * uiDrawReadyIconTexture = nullptr;
     Texture * uiNumbersTexture       = nullptr;
 
-
-    Texture * blendedText            = nullptr;
-
-
-    Point     blendedTextSize   = { 0, 0 };
-
+    //Texture * blendedText            = nullptr;
+    //Point     blendedTextSize   = { 0, 0 };
 
     //-----------------------------------------------
-    ///ENEMY
-    //testing single enemy
-    Enemy *enemyInstance;
-    //multiple enemies
+
     std::vector<Enemy*> enemyVec;
     std::vector<Enemy*> enemyDeadVec;
     std::unordered_set<int> setForHitEnemyIDs;
-    bool respawnToggle = false;
+    bool respawnToggle = true;
 
     Player *p;
-    //standard player size is 32x32.
+
+    //current player size is 32x32. Spritesheet in 64x64.
     ///TODO give player a clip rect when taking damage is implemented
     Rect playerClipRect = {64,0,64,64};
 
-    ///UI needs to be refactored badly. All of this stuff should be composed into classes. Noticed that too late.
-    /// naming them uiSomething_ helped but this still hurts to look at
-    ///uiCard and uiPile are background objects while numbers and icons are foreground
+    /**UI needs to be refactored badly. All of this stuff should be composed into classes. Noticed that too late.
+    * Naming them uiSomething_ helped but this still hurts to look at.
+    * uiCard and uiPile are background objects while numbers and icons are foreground.
+     * Kommentare für UI sollen helfen den Überblick zu behalten bis ich das refactor.
+    */
 
     //define UI background surface dimensions
     Rect guiRect = {0,SCREEN_HEIGHT-SCREEN_HEIGHT/3,SCREEN_WIDTH,SCREEN_HEIGHT/3};
@@ -169,7 +165,6 @@ protected:
     std::vector< Hitbox > colliderVec;
 
 
-    //colors
     static constexpr const Color white { 255, 255, 255, 255 };
     static constexpr const Color black { 0, 0, 0, 255 };
 
@@ -185,7 +180,6 @@ public:
     void Render( const u32 frame, const u32 totalMSec, const float deltaT ) override;
 
     //new functions
-    // does the logic for cards in cardVector
     void activeCardsLogic(const Vector<Card *>& cardVector, u32 frame);
     void renderActiveCardsInVector(const Vector<Card *> &cardVector);
 
@@ -214,10 +208,10 @@ public:
     Texture* loadFromFile(const std::string& path);
 
     //these are a good indicator for things that should be classes
-    void setUICardClipOffset(int offset){ uiCard_Clip.x = uiCard_Clip.w * offset;}
-    void setUIPileClipOffset(int offset){ uiPile_Clip.x = uiPile_Clip.w * offset;}
-    void setUIIconDrawReadyClipOffset(int offset){uiIcon_DrawReadyClip.x = uiIcon_DrawReadyClip.w * offset;}
-    void setUINumbersClipOffset(int offset){uiNumbers_Clip.x = uiNumbers_Clip.w* offset;}
+    void setUICardClipOffset(int offset)noexcept{ uiCard_Clip.x = uiCard_Clip.w * offset;}
+    void setUIPileClipOffset(int offset)noexcept{ uiPile_Clip.x = uiPile_Clip.w * offset;}
+    void setUIIconDrawReadyClipOffset(int offset)noexcept{uiIcon_DrawReadyClip.x = uiIcon_DrawReadyClip.w * offset;}
+    void setUINumbersClipOffset(int offset)noexcept{uiNumbers_Clip.x = uiNumbers_Clip.w* offset;}
 
     //helper to pack all cooldowns into one easy to find place
     void manageCooldowns(u32 frame);
