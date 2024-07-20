@@ -373,6 +373,7 @@ void MortalFlawState::Render( const u32 frame, const u32 totalMSec, const float 
 
             renderFromSpritesheet(a->getRect(), enemyTexture, a->getClip());
 
+            //Vulnerable hat aktuell das Dagger Spritesheet als placeholder textur
             if (a->vulnerable) {
                 if(a->vulnerableTimer > frame) {
                     renderFromSpritesheet(a->getRect(), cardDaggerTexture, nullptr);
